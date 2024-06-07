@@ -1,95 +1,66 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import { Typography, List, ListItem } from '@mui/material';
+import GetNftHolders from '../components/GetNFTHolders';
+import GetTokenOwnership from '../components/GetTokenOwnership';
+import GetTokenTransfers from '../components/GetTokenTransfers';
+
+const Home = () => {
+  const [mainContractAddress, setMainContractAddress] = useState<string>('');
+  const [tokenContractAddresses, setTokenContractAddresses] = useState<string[]>([]);
+  const [holders, setHolders] = useState<string[]>([]);
+  const [ownershipData, setOwnershipData] = useState<{ [address: string]: string[] }>({});
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <>
+      <Typography variant="h4" gutterBottom>
+        Dashboard Overview
+      </Typography>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+      <GetNftHolders setHolders={setHolders} setContractAddress={setMainContractAddress} />
+
+      <Typography variant="h6" gutterBottom>
+        NFT Holders
+      </Typography>
+      {holders.length > 0 ? (
+        <List>
+          {holders.map((holder) => (
+            <ListItem key={holder}>{holder}</ListItem>
+          ))}
+        </List>
+      ) : (
+        <Typography>No holders found or enter a valid contract address.</Typography>
+      )}
+
+      <GetTokenOwnership holders={holders} setOwnershipData={setOwnershipData} />
+
+      <Typography variant="h6" gutterBottom>
+        Ownership Breakdown
+      </Typography>
+      {Object.keys(ownershipData).length > 0 ? (
+        <List>
+          {Object.entries(ownershipData).map(([tokenAddress, tokenHolders]) => (
+            <ListItem key={tokenAddress}>
+              <Typography variant="body1">
+                {tokenAddress}: {tokenHolders.length} holders
+              </Typography>
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <Typography>No token ownership data available.</Typography>
+      )}
+
+      {mainContractAddress && (
+        <GetTokenTransfers 
+          mainContractAddress={mainContractAddress}
+          tokenContractAddresses={Object.keys(ownershipData)}
+          holders={holders} 
         />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      )}
+    </>
   );
-}
+};
+
+export default Home;
