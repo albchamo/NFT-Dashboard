@@ -14,11 +14,6 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6">NFT Dashboard</Typography>
-        </Toolbar>
-      </AppBar>
       <Container>
         {children}
       </Container>

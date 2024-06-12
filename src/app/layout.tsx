@@ -8,9 +8,6 @@ interface RootLayoutProps {
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
-      <head>
-        <title>NFT Dashboard</title>
-      </head>
       <body>
         <Layout>{children}</Layout>
       </body>

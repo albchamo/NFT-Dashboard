@@ -1,15 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Typography, Button, TextField, List, ListItem, IconButton } from '@mui/material';
-import { Delete } from '@mui/icons-material';
+import { Box, Drawer, Typography } from '@mui/material';
 import { getHolders, getAllHolders, analyzeHolders } from '../services/alchemyService';
+import Header from '../components/Header';
+import NodeForm from '../components/NodeForm';
+import Chart from '../components/BarChart';
+import AstroChart from '../components/AstroChart';
+import CSVUpload from '../components/CSVUpload';
+import CSVExport from '../components/CSVExport';
 
 const Dashboard = () => {
-  const [mainContract, setMainContract] = useState('');
+  const [nodes, setNodes] = useState([{ address: '', tag: '' }]);
   const [mainHolders, setMainHolders] = useState<Set<string> | null>(null);
-  const [otherContracts, setOtherContracts] = useState([{ address: '', tag: '' }]);
   const [loading, setLoading] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
+  const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
   const [analysisResults, setAnalysisResults] = useState<null | {
     totalMainHolders: number;
     holdersWithAllTokens: number;
@@ -17,143 +24,114 @@ const Dashboard = () => {
     holdersWithNoOtherTokens: number;
     tokenHoldingCounts: { [key: number]: number };
   }>(null);
+  const [allHolders, setAllHolders] = useState<{ address: string; holders: Set<string> }[]>([]);
 
-  const fetchMainHolders = async () => {
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
+  const fetchAllHolders = async () => {
     setLoading(true);
     try {
-      const holders = await getHolders(mainContract);
-      setMainHolders(holders);
+      const holderPromises = nodes.map(node => getHolders(node.address));
+      const holdersList = await Promise.all(holderPromises);
+      const allHoldersData = holdersList.map((holders, index) => ({
+        address: nodes[index].address,
+        holders,
+      }));
+      setAllHolders(allHoldersData);
+
+      if (nodes.length === 1) {
+        setMainHolders(holdersList[0]);
+      } else {
+        const mainHolders = holdersList[0];
+        const otherContracts = nodes.slice(1); // All nodes except the first one
+        const { otherHolders } = await getAllHolders(nodes[0].address, otherContracts);
+        const analysis = analyzeHolders(mainHolders, otherHolders);
+        setAnalysisResults(analysis);
+        setMainHolders(mainHolders);
+      }
     } catch (error) {
-      console.error('Error fetching main contract holders:', error);
+      console.error('Error fetching holders:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchOtherContractsData = async () => {
-    if (!mainHolders) return;
-
-    setLoading(true);
-    try {
-      const { otherHolders } = await getAllHolders(mainContract, otherContracts);
-      const analysis = analyzeHolders(mainHolders, otherHolders);
-      setAnalysisResults(analysis);
-    } catch (error) {
-      console.error('Error fetching data for other contracts:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleNodeChange = (index: number, field: 'address' | 'tag', value: string) => {
+    const updatedNodes = [...nodes];
+    updatedNodes[index][field] = value;
+    setNodes(updatedNodes);
   };
 
-  const handleOtherContractChange = (index: number, field: 'address' | 'tag', value: string) => {
-    const updatedContracts = [...otherContracts];
-    updatedContracts[index][field] = value;
-    setOtherContracts(updatedContracts);
+  const addNodeField = () => {
+    setNodes([...nodes, { address: '', tag: '' }]);
   };
 
-  const addContractField = () => {
-    setOtherContracts([...otherContracts, { address: '', tag: '' }]);
+  const removeNodeField = (index: number) => {
+    const updatedNodes = [...nodes];
+    updatedNodes.splice(index, 1);
+    setNodes(updatedNodes);
   };
 
-  const removeContractField = (index: number) => {
-    const updatedContracts = [...otherContracts];
-    updatedContracts.splice(index, 1);
-    setOtherContracts(updatedContracts);
+  const handleCSVUpload = (data: { address: string; tag: string }[]) => {
+    setNodes(data);
+  };
+
+  const exportData = () => {
+    // Prepare data for export
+    const data = nodes.map(node => ({ address: node.address, tag: node.tag }));
+    return data;
+  };
+
+  const handleHoverTokenCount = (tokenCount: number) => {
+    setHoverTokenCount(tokenCount);
+  };
+
+  const handleLeaveTokenCount = () => {
+    setHoverTokenCount(null);
+  };
+
+  const handleClickTokenCount = (tokenCount: number) => {
+    setClickTokenCount(tokenCount);
   };
 
   return (
     <div>
-      <Typography variant="h4" gutterBottom>
-        Dashboard Overview
-      </Typography>
-
-      <TextField
-        label="Main NFT Contract Address"
-        value={mainContract}
-        onChange={(e) => setMainContract(e.target.value)}
-        fullWidth
-        margin="normal"
-      />
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={fetchMainHolders}
-        disabled={loading || !mainContract}
-      >
-        {loading ? 'Loading...' : 'Fetch Main Contract Holders'}
-      </Button>
-
-      {mainHolders && (
-        <Typography variant="h6" gutterBottom>
-          Number of Holders for Main Contract: {mainHolders.size}
-        </Typography>
-      )}
-
-      {mainHolders && (
-        <>
-          {otherContracts.map((contract, index) => (
-            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-              <TextField
-                label="Token Contract Address"
-                value={contract.address}
-                onChange={(e) => handleOtherContractChange(index, 'address', e.target.value)}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Tag"
-                value={contract.tag}
-                onChange={(e) => handleOtherContractChange(index, 'tag', e.target.value)}
-                fullWidth
-                margin="normal"
-                style={{ marginLeft: '8px' }}
-              />
-              <IconButton
-                onClick={() => removeContractField(index)}
-                color="secondary"
-                aria-label="remove contract"
-                style={{ marginLeft: '8px' }}
-              >
-                <Delete />
-              </IconButton>
-            </div>
-          ))}
-
-          <Button variant="contained" color="primary" onClick={addContractField}>
-            Add Another Contract
-          </Button>
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={fetchOtherContractsData}
-            disabled={loading || otherContracts.some(contract => !contract.address)}
-            style={{ marginTop: '16px' }}
-          >
-            {loading ? 'Loading...' : 'Fetch Data for Other Contracts'}
-          </Button>
-        </>
-      )}
-
-      {analysisResults && (
-        <div>
+      <Header onMenuClick={toggleDrawer} />
+      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer} PaperProps={{ style: { width: '69%' } }}>
+        <Box p={2} role="presentation">
           <Typography variant="h6" gutterBottom>
-            Analysis Results
+            Node Configuration
           </Typography>
-          <List>
-            <ListItem>Total Main Holders: {analysisResults.totalMainHolders}</ListItem>
-            <ListItem>Holders with All Tokens: {analysisResults.holdersWithAllTokens}</ListItem>
-            <ListItem>Holders with Some Tokens: {analysisResults.holdersWithSomeTokens}</ListItem>
-            <ListItem>Holders with No Other Tokens: {analysisResults.holdersWithNoOtherTokens}</ListItem>
-            {Object.entries(analysisResults.tokenHoldingCounts).map(([count, holders]) => (
-              <ListItem key={count}>
-                Holders with {count} Tokens: {holders}
-              </ListItem>
-            ))}
-          </List>
-        </div>
-      )}
+          <CSVUpload onUpload={handleCSVUpload} />
+          <NodeForm
+            nodes={nodes}
+            handleNodeChange={handleNodeChange}
+            addNodeField={addNodeField}
+            removeNodeField={removeNodeField}
+            fetchAllHolders={fetchAllHolders}
+            loading={loading}
+          />
+          <CSVExport data={exportData()} filename="nodes.csv" />
+        </Box>
+      </Drawer>
+
+      <Box display="flex" flexDirection="row" p={3}>
+        <Box width="40%" p={2}>
+          <Chart
+            analysisResults={analysisResults}
+            onHoverTokenCount={handleHoverTokenCount}
+            onLeaveTokenCount={handleLeaveTokenCount}
+            onClickTokenCount={handleClickTokenCount}
+          />
+        </Box>
+        <Box width="60%" p={2}>
+          {!loading && analysisResults && (
+            <AstroChart nodes={nodes} holdersData={allHolders} onHoverTokenCount={hoverTokenCount} onClickTokenCount={clickTokenCount} />
+          )}
+        </Box>
+      </Box>
     </div>
   );
 };
