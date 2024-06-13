@@ -43,6 +43,7 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
     const svg = d3.select(svgRef.current)
       .attr('width', width)
       .attr('height', height)
+      .style('background-color', '#000') // Dark background
       .append('g')
       .attr('transform', `translate(${width / 2},${height / 2})`);
 
@@ -57,15 +58,11 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
       y: radius * Math.sin(index * angleStep - Math.PI / 2),
     }));
 
-    console.log('Node Data:', nodeData);
-
     const linkData: Link[] = analysisResults.linkData.map(link => ({
       ...link,
       source: nodeData.find(n => n.id === link.source)!,
       target: nodeData.find(n => n.id === link.target)!,
     }));
-
-    console.log('Link Data:', linkData);
 
     const link = svg.append('g')
       .selectAll('path')
@@ -78,7 +75,7 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
           dr = Math.sqrt(dx * dx + dy * dy);
         return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
       })
-      .attr('stroke-width', d => Math.sqrt(d.value) / 2)
+      .attr('stroke-width', d => Math.sqrt(d.value) / 4) // Adjusted line thickness
       .attr('stroke', d => linkColorScale(d.value))
       .attr('fill', 'none')
       .attr('stroke-opacity', 0.9);
@@ -92,16 +89,16 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 
     node.append('circle')
       .attr('r', 10)
-      .attr('fill', '#69b3a2')
-      .attr('stroke', '#000')
+      .attr('fill', '#d80032') // Light color for nodes
+      .attr('stroke', '#fff')
       .attr('stroke-width', 1.5);
 
     node.append('text')
       .attr('dy', -15)
       .attr('text-anchor', 'middle')
       .text(d => d.tag)
-      .style('fill', '#000')
-      .style('font-size', '12px');
+      .style('fill', '#fff') // Light color for text
+      .style('font-size', '20px');
 
     const tooltip = d3.select('body').append('div')
       .attr('class', 'tooltip')
@@ -143,7 +140,7 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 
       d3.selectAll(`.link-${tokenCount}`)
         .attr('stroke-opacity', 0.9)
-        .attr('stroke', '#ff0');
+        .attr('stroke', '#ff0'); // Highlight color
     };
 
     const handleLeaveTokenCount = () => {
