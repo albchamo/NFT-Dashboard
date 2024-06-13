@@ -40,7 +40,7 @@ const NodeForm: React.FC<NodeFormProps> = ({
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="nodes">
         {(provided) => (
-          <div {...provided.droppableProps} ref={provided.innerRef} style={{ padding: '16px', overflowY: 'auto' }}>
+          <div {...provided.droppableProps} ref={provided.innerRef} style={{ padding: '0 40px', overflowY: 'auto' }}>
             {nodes.map((node, index) => (
               <Draggable key={index} draggableId={index.toString()} index={index}>
                 {(provided) => (
@@ -51,32 +51,66 @@ const NodeForm: React.FC<NodeFormProps> = ({
                     display="flex"
                     alignItems="center"
                     marginBottom="8px"
-                    style={{ padding: '8px', borderRadius: '4px' }}
+                    style={{ padding: '0 40px', borderRadius: '4px' }}
                   >
-                    <TextField
-                      label={`Node ${index + 1} Contract Address`}
-                      value={node.address}
-                      onChange={(e) => handleNodeChange(index, 'address', e.target.value)}
-                      margin="normal"
-                      style={{ flex: 2 }}
-                      InputLabelProps={{ style: { color: '#ffffff' } }}
-                      InputProps={{
-                        style: { color: '#ffffff', borderColor: '#ffffff' },
-                        sx: { '& .MuiOutlinedInput-root': { borderColor: '#ffffff' } },
-                      }}
-                    />
-                    <TextField
-                      label="Tag"
-                      value={node.tag}
-                      onChange={(e) => handleNodeChange(index, 'tag', e.target.value)}
-                      margin="normal"
-                      style={{ flex: 1, marginLeft: '8px' }}
-                      InputLabelProps={{ style: { color: '#ffffff' } }}
-                      InputProps={{
-                        style: { color: '#ffffff', borderColor: '#ffffff' },
-                        sx: { '& .MuiOutlinedInput-root': { borderColor: '#ffffff' } },
-                      }}
-                    />
+<TextField
+  label={`Node ${index + 1} Contract Address`}
+  value={node.address}
+  onChange={(e) => handleNodeChange(index, 'address', e.target.value)}
+  margin="normal"
+  style={{ flex: 2 }}
+  InputLabelProps={{ style: { color: '#ffffff' } }}
+  InputProps={{
+    style: { color: '#ffffff' },
+    classes: {
+      notchedOutline: {
+        borderWidth: '2px',
+        borderColor: '#ffffff',
+      },
+    },
+    sx: {
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#ffffff',
+        borderWidth: '2px', // Adjust the border width here
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#ffffff',
+        borderWidth: '2px', // Adjust the border width on hover
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#ffffff',
+        borderWidth: '2px', // Adjust the border width when focused
+      },
+    },
+  }}
+/>
+
+<TextField
+  label="Tag"
+  value={node.tag}
+  onChange={(e) => handleNodeChange(index, 'tag', e.target.value)}
+  margin="normal"
+  style={{ flex: 1, marginLeft: '8px' }}
+  InputLabelProps={{ style: { color: '#ffffff' } }}
+  InputProps={{
+    style: { color: '#ffffff' },
+    sx: {
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#ffffff',
+        borderWidth: '2px', // Adjust the border width here
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#ffffff',
+        borderWidth: '2px', // Adjust the border width on hover
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#ffffff',
+        borderWidth: '2px', // Adjust the border width when focused
+      },
+    },
+  }}
+/>
+
                     <IconButton
                       onClick={() => removeNodeField(index)}
                       aria-label="remove node"
@@ -98,7 +132,7 @@ const NodeForm: React.FC<NodeFormProps> = ({
           style={{
             backgroundColor: '#ffffff',
             color: '#000000',
-            padding: '16px',
+            padding: '0px',
             borderRadius: '50%',
             fontSize: '32px',
           }}

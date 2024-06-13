@@ -112,12 +112,19 @@ const Dashboard = () => {
         onClose={toggleDrawer}
         PaperProps={{
           style: {
-            width: '70%',
+            width: '75%',
             margin: '0 auto',
             backgroundColor: '#000000',
             color: '#ffffff',
-            padding: '16px',
+            paddingTop: "0px",
+            paddingBottom: "0px",
+            paddingLeft: "0px",
+            paddingRight: "0px",
             borderRadius: '8px',
+            borderColor: '#fff',
+            borderLeft: '2px solid #fff',  // Add this line
+            borderRight: '2px solid #fff', // Add this line
+            borderBottom: '2px solid #fff' // Add this line
           },
         }}
       >
@@ -130,7 +137,7 @@ const Dashboard = () => {
               style={{
                 borderColor: '#fff',
                 color: '#fff',
-                borderWidth: '1px',
+                borderWidth: '2px',
                 borderStyle: 'solid',
                 padding: '8px 16px',
                 margin: '0 12px',
@@ -154,7 +161,7 @@ const Dashboard = () => {
               style={{
                 borderColor: '#fff',
                 color: '#fff',
-                borderWidth: '1px',
+                borderWidth: '2px',
                 borderStyle: 'solid',
                 padding: '8px 16px',
                 margin: '0 12px',
@@ -167,7 +174,7 @@ const Dashboard = () => {
               style={{
                 borderColor: '#fff',
                 color: '#fff',
-                borderWidth: '1px',
+                borderWidth: '2px',
                 borderStyle: 'solid',
                 padding: '8px 16px',
                 margin: '0 12px',
@@ -176,9 +183,13 @@ const Dashboard = () => {
               Fetch Data
             </Button>
           </Box>
-          <Typography variant="body1" gutterBottom style={{ marginTop: '16px' }}>
-            Paste the Contract Address and add a Tag for identification. You can also upload a CSV. Remember to export and store your contract lists locally, we will not save any data.
-          </Typography>
+          <Typography
+  variant="body1"
+  gutterBottom
+  style={{ paddingTop: '16px', paddingBottom: '32px', paddingLeft: '18%', paddingRight: '18%' }}
+>
+  Paste the Contract Address and add a Tag for identification. You can also upload a CSV. Remember to export and store your contract lists locally, we will not save any data.
+</Typography>
           <NodeForm
             nodes={nodes}
             setNodes={setNodes}
@@ -191,15 +202,15 @@ const Dashboard = () => {
         </Box>
       </Drawer>
 
-      <Box display="flex" flexDirection="row" p={3}>
-        <Box width="40%" p={2}>
+      <Box display="flex" flexDirection="row"  width="100%">
+        <Box width="25%" >
           <Chart
             analysisResults={analysisResults}
             onHoverTokenCount={handleHoverTokenCount}
             onLeaveTokenCount={handleLeaveTokenCount}
           />
         </Box>
-        <Box width="60%" p={2}>
+        <Box width="75%" >
           {!loading && analysisResults && (
             <AstroChart
               nodes={nodes}
