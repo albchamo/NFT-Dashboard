@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
-import Layout from '../components/Layout';
+import dynamic from 'next/dynamic';
+
+const Layout = dynamic(() => import('../components/Layout'), { ssr: false });
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -8,7 +10,7 @@ interface RootLayoutProps {
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
-      <body>
+      <body style={{ backgroundColor: '#000000', color: '#ffffff' }}> {/* Dark background and white font */}
         <Layout>{children}</Layout>
       </body>
     </html>

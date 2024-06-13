@@ -1,4 +1,16 @@
-Here's the updated README file in Markdown format, incorporating the latest changes and updates:
+1. **CSV Upload and Export**:
+   - The `CSVUpload` and `CSVExport` components are now properly triggered via hidden buttons and external controls.
+   - The CSV upload button opens a file dialog for users to upload CSV files, and the CSV export button generates and downloads a CSV file with the current node data.
+
+2. **Drawer UI**:
+   - Adjustments have been made to the Drawer and NodeForm components to improve the visual appearance and usability, including styling changes for buttons and inputs.
+
+3. **Charts**:
+   - Both `Chart` and `AstroChart` components are functioning correctly, displaying analysis results as expected.
+
+### Updated Readme File
+
+Here's the updated readme file reflecting the latest changes and functionalities:
 
 ```markdown
 # NFT Dashboard
@@ -22,8 +34,6 @@ The NFT Dashboard is a tool for analyzing the relationships between holders of m
 ### AstroChart
 - Visualizes relationships between token holders.
 - Nodes represent different contracts, and lines represent common holders.
-- Nodes are labeled with tags for easier identification.
-- Lines connecting nodes represent common holders, with the thickness and color indicating the number of common holders.
 
 ### CSVUpload
 - Upload a CSV file to batch import node addresses and tags.
@@ -49,60 +59,81 @@ The NFT Dashboard is a tool for analyzing the relationships between holders of m
 1. Clone the repository.
    ```sh
    git clone <repository-url>
-   ```
-2. Navigate to the project directory.
-   ```sh
    cd NFT-Dashboard-master
    ```
-3. Install the dependencies.
+
+2. Install the dependencies.
    ```sh
    npm install
    ```
-4. Create a .env file in the root directory and add your Alchemy API key.
-   ```makefile
+
+3. Create a `.env` file in the root directory and add your Alchemy API key.
+   ```env
    NEXT_PUBLIC_ALCHEMY_API_KEY=your-alchemy-api-key
    ```
-5. Run the development server.
+
+4. Run the development server.
    ```sh
    npm run dev
    ```
 
 ## Usage
 
-1. Open the dashboard in your browser.
-2. Use the NodeForm to input and manage node addresses.
-3. Fetch holder data and analyze the relationships.
-4. Visualize the data using the Chart and AstroChart components.
+1. **Open the dashboard in your browser.**
+2. **Use the NodeForm to input and manage node addresses.**
+3. **Fetch holder data and analyze the relationships.**
+4. **Visualize the data using the Chart and AstroChart components.**
 
-## Instructions
+### Instructions
 
-### Fetching and Analyzing Data
+#### Fetching and Analyzing Data
 
-- **Input Node Addresses and Tags**:
-  - Use the sidebar to input the addresses and tags of the nodes (NFT contracts) you want to analyze.
-  - Click "Add Another Node" to add more nodes.
+1. **Input Node Addresses and Tags:**
+   - Use the sidebar to input the addresses and tags of the nodes (NFT contracts) you want to analyze.
+   - Click "Add Another Node" to add more nodes.
 
-- **Upload Node Data via CSV**:
-  - Click "Upload CSV" to upload a CSV file with node addresses and tags.
+2. **Upload Node Data via CSV:**
+   - Click "CSV" and select "Upload CSV" to upload a CSV file with node addresses and tags.
 
-- **Fetch Holders Data**:
-  - Click "Fetch Holders" to retrieve holder data from the Alchemy API.
+3. **Fetch Holders Data:**
+   - Click "Fetch Data" to retrieve holder data from the Alchemy API.
 
-- **View Analysis**:
-  - The bar chart displays the number of holders with 1, 2, 3, etc., tokens in common.
-  - The AstroChart visualizes the relationships between token holders.
+4. **View Analysis:**
+   - The bar chart displays the number of holders with 1, 2, 3, etc., tokens in common.
+   - The AstroChart visualizes the relationships between token holders.
 
-### Interacting with the Visualization
+#### Interacting with the Visualization
 
-- **Hover Over Bar Chart**:
-  - Hovering over the bars in the chart will highlight the corresponding connections in the AstroChart.
+1. **Hover Over Bar Chart:**
+   - Hovering over the bars in the chart will highlight the corresponding connections in the AstroChart.
 
-- **Click on Bars**:
-  - Clicking on bars in the chart will keep the corresponding connections highlighted.
+2. **Click on Bars:**
+   - Clicking on bars in the chart will keep the corresponding connections highlighted.
 
-### Not Used Components
+## Not Used Components
 
 - **AnalysisResults**: Currently not being used in the dashboard.
+
+## Additional Notes
+
+- **Styling and UI Enhancements:**
+  - Adjusted the styling of buttons and inputs for better user experience.
+  - Improved the layout and visual appeal of the Drawer and NodeForm components.
+
+- **Event Handling:**
+  - Implemented proper event handling for CSV upload and export functionalities.
 ```
 
-This updated README includes the changes to the AstroChart component, the use of tags for easier identification, and the steps to fetch and visualize holder data. Let me know if there are any additional details or sections you'd like to include!
+### Next Steps
+
+1. **Testing**:
+   - Test the CSV upload and export functionalities to ensure data is correctly imported and exported.
+   - Test the fetching and visualization of holder data to confirm accurate analysis and representation.
+
+2. **UI Improvements**:
+   - Further refine the UI based on feedback and usability testing.
+
+3. **Documentation**:
+   - Update the documentation and readme file to reflect any new features or changes.
+
+Feel free to reach out if you need any further assistance or if there are other functionalities you would like to implement!

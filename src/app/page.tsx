@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Drawer, Typography } from '@mui/material';
+import { Box, Drawer, Typography, Button, Menu, MenuItem } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { getHolders, getAllHolders } from '../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../components/analysisService';
 import Header from '../components/Header';
@@ -17,9 +18,34 @@ const Dashboard = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const toggleDrawer = () => {
     setDrawerOpen(prev => !prev);
+  };
+
+  const handleCSVClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCSVClose = () => {
+    setAnchorEl(null);
+  };
+
+  const onCSVUploadClick = () => {
+    const uploadButton = document.getElementById('csv-upload-button');
+    if (uploadButton) {
+      uploadButton.click();
+    }
+    handleCSVClose();
+  };
+
+  const onCSVExportClick = () => {
+    const exportButton = document.getElementById('csv-export-button');
+    if (exportButton) {
+      exportButton.click();
+    }
+    handleCSVClose();
   };
 
   const fetchAllHolders = async () => {
@@ -73,22 +99,95 @@ const Dashboard = () => {
 
   return (
     <div>
-      <Header onMenuClick={toggleDrawer} />
-      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer} PaperProps={{ style: { width: '69%' } }}>
-        <Box p={2} role="presentation">
-          <Typography variant="h6" gutterBottom>
-            Node Configuration
+      <Header
+        onControlClick={toggleDrawer}
+        onFetchDataClick={fetchAllHolders}
+        onCSVUploadClick={onCSVUploadClick}
+        onCSVExportClick={onCSVExportClick}
+        isDrawerOpen={drawerOpen}
+      />
+      <Drawer
+        anchor="top"
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        PaperProps={{
+          style: {
+            width: '70%',
+            margin: '0 auto',
+            backgroundColor: '#000000',
+            color: '#ffffff',
+            padding: '16px',
+            borderRadius: '8px',
+          },
+        }}
+      >
+        <Box role="presentation" display="flex" flexDirection="column" style={{ paddingTop: '16px' }}>
+          <Box display="flex" justifyContent="center" mb={2}>
+            <Button
+              aria-controls="csv-menu"
+              aria-haspopup="true"
+              onClick={handleCSVClick}
+              style={{
+                borderColor: '#fff',
+                color: '#fff',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                padding: '8px 16px',
+                margin: '0 12px',
+              }}
+            >
+              CSV <ArrowDropDownIcon />
+            </Button>
+            <Menu
+              id="csv-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleCSVClose}
+              PaperProps={{ style: { backgroundColor: '#ffffff', color: '#000000' } }}
+            >
+              <MenuItem onClick={onCSVUploadClick} style={{ color: '#000000' }}>Upload CSV</MenuItem>
+              <MenuItem onClick={onCSVExportClick} style={{ color: '#000000' }}>Export CSV</MenuItem>
+            </Menu>
+            <Button
+              onClick={toggleDrawer}
+              style={{
+                borderColor: '#fff',
+                color: '#fff',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                padding: '8px 16px',
+                margin: '0 12px',
+              }}
+            >
+              {drawerOpen ? 'Close Control' : 'Open Control'}
+            </Button>
+            <Button
+              onClick={fetchAllHolders}
+              style={{
+                borderColor: '#fff',
+                color: '#fff',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                padding: '8px 16px',
+                margin: '0 12px',
+              }}
+            >
+              Fetch Data
+            </Button>
+          </Box>
+          <Typography variant="body1" gutterBottom style={{ marginTop: '16px' }}>
+            Paste the Contract Address and add a Tag for identification. You can also upload a CSV. Remember to export and store your contract lists locally, we will not save any data.
           </Typography>
-          <CSVUpload onUpload={handleCSVUpload} />
           <NodeForm
             nodes={nodes}
+            setNodes={setNodes}
             handleNodeChange={handleNodeChange}
             addNodeField={addNodeField}
             removeNodeField={removeNodeField}
             fetchAllHolders={fetchAllHolders}
             loading={loading}
           />
-          <CSVExport data={exportData()} filename="nodes.csv" />
         </Box>
       </Drawer>
 
@@ -110,6 +209,10 @@ const Dashboard = () => {
           )}
         </Box>
       </Box>
+      <div style={{ display: 'none' }}>
+        <CSVUpload onUpload={handleCSVUpload} />
+        <CSVExport data={exportData()} filename="nodes.csv" />
+      </div>
     </div>
   );
 };
