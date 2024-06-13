@@ -1,3 +1,6 @@
+Here's the updated README file in Markdown format, incorporating the latest changes and updates:
+
+```markdown
 # NFT Dashboard
 
 ## Overview
@@ -19,6 +22,8 @@ The NFT Dashboard is a tool for analyzing the relationships between holders of m
 ### AstroChart
 - Visualizes relationships between token holders.
 - Nodes represent different contracts, and lines represent common holders.
+- Nodes are labeled with tags for easier identification.
+- Lines connecting nodes represent common holders, with the thickness and color indicating the number of common holders.
 
 ### CSVUpload
 - Upload a CSV file to batch import node addresses and tags.
@@ -44,45 +49,60 @@ The NFT Dashboard is a tool for analyzing the relationships between holders of m
 1. Clone the repository.
    ```sh
    git clone <repository-url>
-Navigate to the project directory.
-sh
-Copy code
-cd NFT-Dashboard-master
-Install the dependencies.
-sh
-Copy code
-npm install
-Create a .env file in the root directory and add your Alchemy API key.
-makefile
-Copy code
-NEXT_PUBLIC_ALCHEMY_API_KEY=your-alchemy-api-key
-Run the development server.
-sh
-Copy code
-npm run dev
+   ```
+2. Navigate to the project directory.
+   ```sh
+   cd NFT-Dashboard-master
+   ```
+3. Install the dependencies.
+   ```sh
+   npm install
+   ```
+4. Create a .env file in the root directory and add your Alchemy API key.
+   ```makefile
+   NEXT_PUBLIC_ALCHEMY_API_KEY=your-alchemy-api-key
+   ```
+5. Run the development server.
+   ```sh
+   npm run dev
+   ```
 
+## Usage
 
-Usage
-Open the dashboard in your browser.
-Use the NodeForm to input and manage node addresses.
-Fetch holder data and analyze the relationships.
-Visualize the data using the Chart and AstroChart components.
-Instructions
-Fetching and Analyzing Data
-Input Node Addresses and Tags:
-Use the sidebar to input the addresses and tags of the nodes (NFT contracts) you want to analyze.
-Click "Add Another Node" to add more nodes.
-Upload Node Data via CSV:
-Click "Upload CSV" to upload a CSV file with node addresses and tags.
-Fetch Holders Data:
-Click "Fetch Holders" to retrieve holder data from the Alchemy API.
-View Analysis:
-The bar chart displays the number of holders with 1, 2, 3, etc., tokens in common.
-The AstroChart visualizes the relationships between token holders.
-Interacting with the Visualization
-Hover Over Bar Chart:
-Hovering over the bars in the chart will highlight the corresponding connections in the AstroChart.
-Click on Bars:
-Clicking on bars in the chart will keep the corresponding connections highlighted.
-Not Used Components
-AnalysisResults: Currently not being used in the dashboard.
+1. Open the dashboard in your browser.
+2. Use the NodeForm to input and manage node addresses.
+3. Fetch holder data and analyze the relationships.
+4. Visualize the data using the Chart and AstroChart components.
+
+## Instructions
+
+### Fetching and Analyzing Data
+
+- **Input Node Addresses and Tags**:
+  - Use the sidebar to input the addresses and tags of the nodes (NFT contracts) you want to analyze.
+  - Click "Add Another Node" to add more nodes.
+
+- **Upload Node Data via CSV**:
+  - Click "Upload CSV" to upload a CSV file with node addresses and tags.
+
+- **Fetch Holders Data**:
+  - Click "Fetch Holders" to retrieve holder data from the Alchemy API.
+
+- **View Analysis**:
+  - The bar chart displays the number of holders with 1, 2, 3, etc., tokens in common.
+  - The AstroChart visualizes the relationships between token holders.
+
+### Interacting with the Visualization
+
+- **Hover Over Bar Chart**:
+  - Hovering over the bars in the chart will highlight the corresponding connections in the AstroChart.
+
+- **Click on Bars**:
+  - Clicking on bars in the chart will keep the corresponding connections highlighted.
+
+### Not Used Components
+
+- **AnalysisResults**: Currently not being used in the dashboard.
+```
+
+This updated README includes the changes to the AstroChart component, the use of tags for easier identification, and the steps to fetch and visualize holder data. Let me know if there are any additional details or sections you'd like to include!
