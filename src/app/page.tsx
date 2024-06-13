@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Box, Drawer, Typography } from '@mui/material';
-import { getHolders, getAllHolders, analyzeHolders } from '../services/alchemyService';
+import { getHolders, getAllHolders } from '../services/alchemyService';
+import { analyzeHolders, AnalysisResults } from '../components/analysisService';
 import Header from '../components/Header';
 import NodeForm from '../components/NodeForm';
 import Chart from '../components/BarChart';
@@ -12,45 +13,25 @@ import CSVExport from '../components/CSVExport';
 
 const Dashboard = () => {
   const [nodes, setNodes] = useState([{ address: '', tag: '' }]);
-  const [mainHolders, setMainHolders] = useState<Set<string> | null>(null);
   const [loading, setLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
-  const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
-  const [analysisResults, setAnalysisResults] = useState<null | {
-    totalMainHolders: number;
-    holdersWithAllTokens: number;
-    holdersWithSomeTokens: number;
-    holdersWithNoOtherTokens: number;
-    tokenHoldingCounts: { [key: number]: number };
-  }>(null);
-  const [allHolders, setAllHolders] = useState<{ address: string; holders: Set<string> }[]>([]);
+  const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
 
   const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
+    setDrawerOpen(prev => !prev);
   };
 
   const fetchAllHolders = async () => {
     setLoading(true);
     try {
-      const holderPromises = nodes.map(node => getHolders(node.address));
-      const holdersList = await Promise.all(holderPromises);
-      const allHoldersData = holdersList.map((holders, index) => ({
-        address: nodes[index].address,
-        holders,
-      }));
-      setAllHolders(allHoldersData);
+      const mainContractAddress = nodes[0].address;
+      const otherContracts = nodes.slice(1);
 
-      if (nodes.length === 1) {
-        setMainHolders(holdersList[0]);
-      } else {
-        const mainHolders = holdersList[0];
-        const otherContracts = nodes.slice(1); // All nodes except the first one
-        const { otherHolders } = await getAllHolders(nodes[0].address, otherContracts);
-        const analysis = analyzeHolders(mainHolders, otherHolders);
-        setAnalysisResults(analysis);
-        setMainHolders(mainHolders);
-      }
+      const { allHolders } = await getAllHolders(mainContractAddress, otherContracts);
+
+      const analysis = analyzeHolders(allHolders);
+      setAnalysisResults(analysis);
     } catch (error) {
       console.error('Error fetching holders:', error);
     } finally {
@@ -79,9 +60,7 @@ const Dashboard = () => {
   };
 
   const exportData = () => {
-    // Prepare data for export
-    const data = nodes.map(node => ({ address: node.address, tag: node.tag }));
-    return data;
+    return nodes.map(node => ({ address: node.address, tag: node.tag }));
   };
 
   const handleHoverTokenCount = (tokenCount: number) => {
@@ -90,10 +69,6 @@ const Dashboard = () => {
 
   const handleLeaveTokenCount = () => {
     setHoverTokenCount(null);
-  };
-
-  const handleClickTokenCount = (tokenCount: number) => {
-    setClickTokenCount(tokenCount);
   };
 
   return (
@@ -123,12 +98,15 @@ const Dashboard = () => {
             analysisResults={analysisResults}
             onHoverTokenCount={handleHoverTokenCount}
             onLeaveTokenCount={handleLeaveTokenCount}
-            onClickTokenCount={handleClickTokenCount}
           />
         </Box>
         <Box width="60%" p={2}>
           {!loading && analysisResults && (
-            <AstroChart nodes={nodes} holdersData={allHolders} onHoverTokenCount={hoverTokenCount} onClickTokenCount={clickTokenCount} />
+            <AstroChart
+              nodes={nodes}
+              analysisResults={analysisResults}
+              hoverTokenCount={hoverTokenCount}
+            />
           )}
         </Box>
       </Box>

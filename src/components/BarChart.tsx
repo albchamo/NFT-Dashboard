@@ -2,21 +2,15 @@ import React from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
+import { AnalysisResults } from '../components/analysisService';
 
 interface ChartProps {
-  analysisResults: {
-    totalMainHolders: number;
-    holdersWithAllTokens: number;
-    holdersWithSomeTokens: number;
-    holdersWithNoOtherTokens: number;
-    tokenHoldingCounts: { [key: number]: number };
-  } | null;
+  analysisResults: AnalysisResults | null;
   onHoverTokenCount: (tokenCount: number) => void;
   onLeaveTokenCount: () => void;
-  onClickTokenCount: (tokenCount: number) => void;
 }
 
-const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount, onClickTokenCount }) => {
+const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount }) => {
   if (!analysisResults) return null;
 
   const barData = Object.entries(analysisResults.tokenHoldingCounts)
@@ -38,7 +32,6 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
           fill="#8884d8"
           onMouseEnter={(data) => onHoverTokenCount(Number(data.name.split(' ')[0]))}
           onMouseLeave={onLeaveTokenCount}
-          onClick={(data) => onClickTokenCount(Number(data.name.split(' ')[0]))}
         />
       </BarChart>
     </ResponsiveContainer>

@@ -1,3 +1,5 @@
+// AlchemyService.ts
+
 import { Alchemy, Network } from 'alchemy-sdk';
 
 const settings = {
@@ -27,51 +29,25 @@ export const getHolders = async (contractAddress: string): Promise<Set<string>> 
 export const getAllHolders = async (
   mainContractAddress: string,
   otherContracts: { address: string; tag: string }[]
-): Promise<{ otherHolders: { [address: string]: Set<string> } }> => {
-  const otherHolders: { [address: string]: Set<string> } = {};
+): Promise<{ allHolders: { [address: string]: Set<string> }, detailedConnections: { [holder: string]: string[] } }> => {
+  const allHolders: { [address: string]: Set<string> } = {};
+  const detailedConnections: { [holder: string]: string[] } = {};
 
-  await Promise.all(otherContracts.map(async contract => {
+  const mainHolders = await getHolders(mainContractAddress);
+  allHolders[mainContractAddress] = mainHolders;
+
+  for (const contract of otherContracts) {
     console.log(`Fetching holders for contract: ${contract.address}`);
 
     try {
       const holders = await alchemy.nft.getOwnersForContract(contract.address);
-      otherHolders[contract.address] = new Set<string>(holders.owners);
+      allHolders[contract.address] = new Set<string>(holders.owners);
       console.log(`Holders for ${contract.address}:`, holders.owners);
     } catch (error) {
       console.error(`Error fetching holders for contract ${contract.address}:`, error);
-      otherHolders[contract.address] = new Set<string>();
+      allHolders[contract.address] = new Set<string>();
     }
-  }));
+  }
 
-  return { otherHolders };
-};
-
-export const analyzeHolders = (
-  mainHolders: Set<string>,
-  otherHolders: { [address: string]: Set<string> }
-) => {
-  let holdersWithAllTokens = 0;
-  let holdersWithSomeTokens = 0;
-  let holdersWithNoOtherTokens = 0;
-  const tokenHoldingCounts: { [key: number]: number } = {};
-
-  mainHolders.forEach(holder => {
-    const tokensOwned = Object.values(otherHolders).filter(holdersSet => holdersSet.has(holder)).length;
-    if (tokensOwned === Object.keys(otherHolders).length) {
-      holdersWithAllTokens++;
-    } else if (tokensOwned > 0) {
-      holdersWithSomeTokens++;
-    } else {
-      holdersWithNoOtherTokens++;
-    }
-    tokenHoldingCounts[tokensOwned] = (tokenHoldingCounts[tokensOwned] || 0) + 1;
-  });
-
-  return {
-    totalMainHolders: mainHolders.size,
-    holdersWithAllTokens,
-    holdersWithSomeTokens,
-    holdersWithNoOtherTokens,
-    tokenHoldingCounts,
-  };
+  return { allHolders, detailedConnections };
 };
