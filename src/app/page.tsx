@@ -202,7 +202,7 @@ const Dashboard = () => {
         </Box>
       </Drawer>
 
-      <Box display="flex" flexDirection="row"  width="100%">
+      <Box display="flex" flexDirection="row"  width="100%" style= {{paddingTop: "40px"}}>
         <Box width="25%" >
           <Chart
             analysisResults={analysisResults}

@@ -36,8 +36,8 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
   useEffect(() => {
     if (!nodes.length || !analysisResults.linkData.length) return;
 
-    const width = 960;
-    const height = 600;
+    const width = 900;
+    const height = 540;
     const radius = Math.min(width, height) / 2 - 40;
 
     const svg = d3.select(svgRef.current)
@@ -158,8 +158,8 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
-        AstroChart
+      <Typography variant="h4" gutterBottom  style= {{ textAlign: 'center' , paddingBottom: "20px"}}>
+        Contract Relationships
       </Typography>
       <svg ref={svgRef}></svg>
     </Box>
