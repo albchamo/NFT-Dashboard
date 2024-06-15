@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Drawer, Typography, Button, Menu, MenuItem } from '@mui/material';
+import { Box, Drawer, Typography, Button, Menu, MenuItem } from "@mui/material";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { getHolders, getAllHolders } from '../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../components/analysisService';
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
+  const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -95,6 +96,10 @@ const Dashboard = () => {
 
   const handleLeaveTokenCount = () => {
     setHoverTokenCount(null);
+  };
+
+  const handleClickTokenCount = (tokenCount: number) => {
+    setClickTokenCount(tokenCount);
   };
 
   return (
@@ -184,12 +189,12 @@ const Dashboard = () => {
             </Button>
           </Box>
           <Typography
-  variant="body1"
-  gutterBottom
-  style={{ paddingTop: '16px', paddingBottom: '32px', paddingLeft: '18%', paddingRight: '18%' }}
->
-  Paste the Contract Address and add a Tag for identification. You can also upload a CSV. Remember to export and store your contract lists locally, we will not save any data.
-</Typography>
+            variant="body1"
+            gutterBottom
+            style={{ paddingTop: '16px', paddingBottom: '32px', paddingLeft: '18%', paddingRight: '18%' }}
+          >
+            Paste the Contract Address and add a Tag for identification. You can also upload a CSV. Remember to export and store your contract lists locally, we will not save any data.
+          </Typography>
           <NodeForm
             nodes={nodes}
             setNodes={setNodes}
@@ -202,20 +207,22 @@ const Dashboard = () => {
         </Box>
       </Drawer>
 
-      <Box display="flex" flexDirection="row"  width="100%" style= {{paddingTop: "40px"}}>
-        <Box width="25%" >
+      <Box display="flex" flexDirection="row" width="100%" style={{ paddingTop: "40px" }}>
+        <Box width="25%">
           <Chart
             analysisResults={analysisResults}
             onHoverTokenCount={handleHoverTokenCount}
             onLeaveTokenCount={handleLeaveTokenCount}
+            onClickTokenCount={handleClickTokenCount}
           />
         </Box>
-        <Box width="75%" >
+        <Box width="75%">
           {!loading && analysisResults && (
             <AstroChart
               nodes={nodes}
               analysisResults={analysisResults}
               hoverTokenCount={hoverTokenCount}
+              clickTokenCount={clickTokenCount} // Add this line
             />
           )}
         </Box>

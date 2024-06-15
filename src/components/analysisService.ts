@@ -3,6 +3,7 @@ export interface AnalysisResults {
   holdersByTokenCount: { [key: number]: Set<string> };
   holderCounts: { [address: string]: number };
   linkData: { source: string, target: string, value: number }[];
+  tokenCombinations: { [key: number]: { [key: string]: Set<string> } }; // Add this line
 }
 
 export const analyzeHolders = (
@@ -12,6 +13,7 @@ export const analyzeHolders = (
   const holdersByTokenCount: { [key: number]: Set<string> } = {};
   const holderCounts: { [address: string]: number } = {};
   const linkData: { source: string, target: string, value: number }[] = [];
+  const tokenCombinations: { [key: number]: { [key: string]: Set<string> } } = {}; // Add this line
 
   const allHolderSet = new Set<string>();
   Object.values(allHolders).forEach(holdersSet => {
@@ -46,10 +48,47 @@ export const analyzeHolders = (
     }
   }
 
+  // Generate data for token combinations of 3, 4, etc.
+  allHolderSet.forEach(holder => {
+    const tokens = Object.keys(allHolders).filter(address => allHolders[address].has(holder));
+    if (tokens.length >= 3) {
+      for (let size = 3; size <= tokens.length; size++) {
+        if (!tokenCombinations[size]) {
+          tokenCombinations[size] = {};
+        }
+        const combinations = getCombinations(tokens, size);
+        combinations.forEach(combination => {
+          const key = combination.sort().join('-');
+          if (!tokenCombinations[size][key]) {
+            tokenCombinations[size][key] = new Set<string>();
+          }
+          tokenCombinations[size][key].add(holder);
+        });
+      }
+    }
+  });
+
   return {
     tokenHoldingCounts,
     holdersByTokenCount,
     holderCounts,
     linkData,
+    tokenCombinations, // Add this line
   };
+};
+
+// Helper function to generate combinations
+const getCombinations = (arr: string[], size: number): string[][] => { // Add types here
+  const result: string[][] = [];
+  const f = (prefix: string[], arr: string[]): void => { // Add types here
+    if (prefix.length === size) {
+      result.push(prefix);
+      return;
+    }
+    for (let i = 0; i < arr.length; i++) {
+      f([...prefix, arr[i]], arr.slice(i + 1));
+    }
+  };
+  f([], arr);
+  return result;
 };

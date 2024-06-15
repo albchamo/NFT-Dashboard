@@ -44,7 +44,12 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
             dataKey="holders"
             fill="#ffffff"
             barSize={20} // Adjust the bar size to make them thinner
-            onMouseEnter={(data) => onHoverTokenCount(Number(data.name.split(' ')[0]))}
+            onMouseEnter={(data) => {
+              const tokenCount = Number(data.name.split(' ')[0]);
+              if (tokenCount >= 3) {
+                onHoverTokenCount(tokenCount);
+              }
+            }}
             onMouseLeave={onLeaveTokenCount}
           >
             {barData.map((entry, index) => (
