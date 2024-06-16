@@ -15,7 +15,6 @@ const Header = ({ onControlClick, onFetchDataClick, onCSVUploadClick, onCSVExpor
   return (
     <AppBar position="static" style={{ background: '#000000', color: '#ffffff' }}>
       <Toolbar style={{ display: 'flex', justifyContent: 'center' }}>
-        <CSVButton onCSVUploadClick={onCSVUploadClick} onCSVExportClick={onCSVExportClick} />
         <Button
           onClick={onControlClick}
           style={{
@@ -27,20 +26,7 @@ const Header = ({ onControlClick, onFetchDataClick, onCSVUploadClick, onCSVExpor
             margin: '0 12px',
           }}
         >
-          {isDrawerOpen ? 'Close Control' : 'Open Control'}
-        </Button>
-        <Button
-          onClick={onFetchDataClick}
-          style={{
-            borderColor: '#ffffff',
-            color: '#ffffff',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            padding: '8px 16px',
-            margin: '0 12px',
-          }}
-        >
-          Fetch Data
+          {isDrawerOpen ? 'Close Control' : 'List Control'}
         </Button>
       </Toolbar>
     </AppBar>

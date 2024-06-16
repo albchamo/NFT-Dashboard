@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Drawer, Typography, Button, Menu, MenuItem } from "@mui/material";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { getHolders, getAllHolders } from '../services/alchemyService';
+import { Box, Typography } from "@mui/material";
+import { getAllHolders } from '../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../components/analysisService';
 import Header from '../components/Header';
-import NodeForm from '../components/NodeForm';
 import Chart from '../components/BarChart';
 import AstroChart from '../components/AstroChart';
 import CSVUpload from '../components/CSVUpload';
 import CSVExport from '../components/CSVExport';
+import ContractDrawer from '../components/ContractDrawer';
+import LoadingModal from '../components/LoadingModal';
 
 const Dashboard = () => {
   const [nodes, setNodes] = useState([{ address: '', tag: '' }]);
@@ -51,6 +51,7 @@ const Dashboard = () => {
 
   const fetchAllHolders = async () => {
     setLoading(true);
+    setDrawerOpen(false);  // Close the drawer when fetching data
     try {
       const mainContractAddress = nodes[0].address;
       const otherContracts = nodes.slice(1);
@@ -99,7 +100,11 @@ const Dashboard = () => {
   };
 
   const handleClickTokenCount = (tokenCount: number) => {
-    setClickTokenCount(tokenCount);
+    if (clickTokenCount === tokenCount) {
+      setClickTokenCount(null);  // Deactivate the view if the same bar is clicked again
+    } else {
+      setClickTokenCount(tokenCount);  // Activate the view for the clicked token count
+    }
   };
 
   return (
@@ -111,102 +116,22 @@ const Dashboard = () => {
         onCSVExportClick={onCSVExportClick}
         isDrawerOpen={drawerOpen}
       />
-      <Drawer
-        anchor="top"
-        open={drawerOpen}
-        onClose={toggleDrawer}
-        PaperProps={{
-          style: {
-            width: '75%',
-            margin: '0 auto',
-            backgroundColor: '#000000',
-            color: '#ffffff',
-            paddingTop: "0px",
-            paddingBottom: "0px",
-            paddingLeft: "0px",
-            paddingRight: "0px",
-            borderRadius: '8px',
-            borderColor: '#fff',
-            borderLeft: '2px solid #fff',  // Add this line
-            borderRight: '2px solid #fff', // Add this line
-            borderBottom: '2px solid #fff' // Add this line
-          },
-        }}
-      >
-        <Box role="presentation" display="flex" flexDirection="column" style={{ paddingTop: '16px' }}>
-          <Box display="flex" justifyContent="center" mb={2}>
-            <Button
-              aria-controls="csv-menu"
-              aria-haspopup="true"
-              onClick={handleCSVClick}
-              style={{
-                borderColor: '#fff',
-                color: '#fff',
-                borderWidth: '2px',
-                borderStyle: 'solid',
-                padding: '8px 16px',
-                margin: '0 12px',
-              }}
-            >
-              CSV <ArrowDropDownIcon />
-            </Button>
-            <Menu
-              id="csv-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleCSVClose}
-              PaperProps={{ style: { backgroundColor: '#ffffff', color: '#000000' } }}
-            >
-              <MenuItem onClick={onCSVUploadClick} style={{ color: '#000000' }}>Upload CSV</MenuItem>
-              <MenuItem onClick={onCSVExportClick} style={{ color: '#000000' }}>Export CSV</MenuItem>
-            </Menu>
-            <Button
-              onClick={toggleDrawer}
-              style={{
-                borderColor: '#fff',
-                color: '#fff',
-                borderWidth: '2px',
-                borderStyle: 'solid',
-                padding: '8px 16px',
-                margin: '0 12px',
-              }}
-            >
-              {drawerOpen ? 'Close Control' : 'Open Control'}
-            </Button>
-            <Button
-              onClick={fetchAllHolders}
-              style={{
-                borderColor: '#fff',
-                color: '#fff',
-                borderWidth: '2px',
-                borderStyle: 'solid',
-                padding: '8px 16px',
-                margin: '0 12px',
-              }}
-            >
-              Fetch Data
-            </Button>
-          </Box>
-          <Typography
-            variant="body1"
-            gutterBottom
-            style={{ paddingTop: '16px', paddingBottom: '32px', paddingLeft: '18%', paddingRight: '18%' }}
-          >
-            Paste the Contract Address and add a Tag for identification. You can also upload a CSV. Remember to export and store your contract lists locally, we will not save any data.
-          </Typography>
-          <NodeForm
-            nodes={nodes}
-            setNodes={setNodes}
-            handleNodeChange={handleNodeChange}
-            addNodeField={addNodeField}
-            removeNodeField={removeNodeField}
-            fetchAllHolders={fetchAllHolders}
-            loading={loading}
-          />
-        </Box>
-      </Drawer>
-
+      <ContractDrawer
+        drawerOpen={drawerOpen}
+        toggleDrawer={toggleDrawer}
+        handleCSVClick={handleCSVClick}
+        anchorEl={anchorEl}
+        handleCSVClose={handleCSVClose}
+        onCSVUploadClick={onCSVUploadClick}
+        onCSVExportClick={onCSVExportClick}
+        fetchAllHolders={fetchAllHolders}
+        nodes={nodes}
+        setNodes={setNodes}
+        handleNodeChange={handleNodeChange}
+        addNodeField={addNodeField}
+        removeNodeField={removeNodeField}
+        loading={loading}
+      />
       <Box display="flex" flexDirection="row" width="100%" style={{ paddingTop: "40px" }}>
         <Box width="25%">
           <Chart
@@ -222,7 +147,8 @@ const Dashboard = () => {
               nodes={nodes}
               analysisResults={analysisResults}
               hoverTokenCount={hoverTokenCount}
-              clickTokenCount={clickTokenCount} // Add this line
+              clickTokenCount={clickTokenCount}
+              setClickTokenCount={setClickTokenCount}
             />
           )}
         </Box>
@@ -231,6 +157,7 @@ const Dashboard = () => {
         <CSVUpload onUpload={handleCSVUpload} />
         <CSVExport data={exportData()} filename="nodes.csv" />
       </div>
+      <LoadingModal open={loading} message="Fetching data... please wait." />
     </div>
   );
 };

@@ -86,11 +86,11 @@ const NodeForm: React.FC<NodeFormProps> = ({
 />
 
 <TextField
-  label="Tag"
+  label="Name"
   value={node.tag}
   onChange={(e) => handleNodeChange(index, 'tag', e.target.value)}
   margin="normal"
-  style={{ flex: 1, marginLeft: '8px' }}
+  style={{ flex: 1, marginLeft: '10px' }}
   InputLabelProps={{ style: { color: '#ffffff' } }}
   InputProps={{
     style: { color: '#ffffff' },
@@ -126,13 +126,13 @@ const NodeForm: React.FC<NodeFormProps> = ({
           </div>
         )}
       </Droppable>
-      <Box display="flex" justifyContent="center" mt={2}>
+      <Box display="flex" justifyContent="center" mt={2} p={2}>
         <IconButton
           onClick={addNodeField}
           style={{
             backgroundColor: '#ffffff',
             color: '#000000',
-            padding: '0px',
+            padding: '12px',
             borderRadius: '50%',
             fontSize: '32px',
           }}
