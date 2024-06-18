@@ -3,6 +3,10 @@ import * as d3 from 'd3';
 import { Typography, Box, Button } from '@mui/material';
 import { AnalysisResults } from '../components/analysisService';
 import CSVExport from '../components/CSVExport';
+import { scaleSequential } from 'd3-scale';
+import { interpolateBlues } from 'd3-scale-chromatic';
+import { useRouter } from 'next/navigation'; // Import Next.js router
+
 
 interface Node {
   id: string;
@@ -31,6 +35,8 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [selectedHolders, setSelectedHolders] = useState<Set<string> | null>(null);
   const [viewState, setViewState] = useState<'Node Relationship View' | 'Token Combination View'>('Node Relationship View');
+  const router = useRouter(); // Initialize the router
+
 
   const linkColorScale = d3.scaleSequential(d3.interpolateBlues)
     .domain([0, d3.max(analysisResults.linkData, d => d.value) || 1]);
@@ -105,6 +111,8 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
       .attr('transform', d => `translate(${d.x},${d.y})`)
       .on('click', function(event, d: Node) {
         console.log(`AstroChart Clicked node: ${d.tag}`);
+        router.push(`/single-contract/${d.id}`); // Navigate to the single contract page
+
       });
 
     nodesGroup.append('circle')
@@ -162,7 +170,12 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 
       const combinations = analysisResults.tokenCombinations[tokenCount];
 
+      // Define a blue color scale
+      const colorScale = scaleSequential(interpolateBlues)
+        .domain([0, Object.keys(combinations).length - 1]);
+
       Object.keys(combinations).forEach((combinationKey, index) => {
+        console.log(`Combination index: ${index}`); // Add this console log to check the index
         const tokenIds = combinationKey.split('-');
         const positions = tokenIds.map(tokenId => {
           const position = nodeData.find(n => n?.id === tokenId);
@@ -181,9 +194,9 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
             .attr('d', d3.line<[number, number]>()(pathData)!)
             .attr('class', 'pattern')
             .attr('fill', 'none')
-            .attr('stroke', colorScale(index.toString()))
+            .attr('stroke', colorScale(index)) // Use the blue color scale
             .attr('stroke-opacity', 0.9)
-            .attr('stroke-width', 4);
+            .attr('stroke-width', 4); // Adjust stroke width if necessary
         }
       });
     };
@@ -237,7 +250,12 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 
       const combinations = analysisResults.tokenCombinations[tokenCount];
 
+      // Define a blue color scale
+      const colorScale = scaleSequential(interpolateBlues)
+        .domain([0, Object.keys(combinations).length - 1]);
+
       Object.keys(combinations).forEach((combinationKey, index) => {
+        console.log(`Combination index: ${index}`); // Add this console log to check the index
         const tokenIds = combinationKey.split('-');
         const positions = tokenIds.map(tokenId => {
           const position = nodeData.find(n => n?.id === tokenId);
@@ -256,9 +274,9 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
             .attr('d', d3.line<[number, number]>()(pathData)!)
             .attr('class', 'pattern')
             .attr('fill', 'none')
-            .attr('stroke', d3.scaleOrdinal(d3.schemeCategory10)(index.toString())!)
+            .attr('stroke', colorScale(index)) // Use the blue color scale
             .attr('stroke-opacity', 0.9)
-            .attr('stroke-width', 4);
+            .attr('stroke-width', 4); // Adjust stroke width if necessary
         }
       });
     };
@@ -338,4 +356,3 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 };
 
 export default AstroChart;
-

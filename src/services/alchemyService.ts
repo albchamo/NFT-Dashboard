@@ -51,3 +51,21 @@ export const getAllHolders = async (
 
   return { allHolders, detailedConnections };
 };
+
+export const getContractMetadata = async (contractAddress: string) => {
+  if (!contractAddress) {
+    throw new Error('Contract address is required');
+  }
+
+  console.log(`Fetching metadata for contract: ${contractAddress}`);
+
+  try {
+    const metadata = await alchemy.core.getTokenMetadata(contractAddress);
+    console.log(`Metadata for ${contractAddress}:`, metadata);
+    return metadata;
+  } catch (error) {
+    console.error(`Error fetching metadata for contract ${contractAddress}:`, error);
+    return null;
+  }
+};
+
