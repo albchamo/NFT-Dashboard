@@ -2,6 +2,8 @@ import React from 'react';
 import { Box, Drawer, Button, Menu, MenuItem, Typography } from "@mui/material";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import NodeForm from './NodeForm';
+import CSVExport from './CSVExport'; // Import CSVExport
+
 
 interface ContractDrawerProps {
   drawerOpen: boolean;
@@ -119,6 +121,8 @@ const ContractDrawer: React.FC<ContractDrawerProps> = ({
           fetchAllHolders={fetchAllHolders}
           loading={loading}
         />
+                <CSVExport data={nodes.map(node => ({ address: node.address, tag: node.tag }))} filename="nodes.csv" />
+
       </Box>
     </Drawer>
   );

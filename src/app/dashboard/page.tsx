@@ -1,9 +1,7 @@
-// src/app/dashboard/page.tsx
-
 'use client';
 
 import React, { useState } from 'react';
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { getAllHolders } from '../../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../../components/analysisService';
@@ -46,10 +44,28 @@ const Dashboard = () => {
     handleCSVClose();
   };
 
+  const exportData = () => {
+    if (!analysisResults) return [];
+
+    let holders: Set<string> | null = null;
+
+    if (clickTokenCount !== null && clickTokenCount > 0) {
+      holders = analysisResults.holdersByTokenCount[clickTokenCount];
+    }
+
+    return Array.from(holders || new Set(Object.keys(analysisResults.holderCounts))).map(holder => ({ address: holder }));
+  };
+
   const onCSVExportClick = () => {
-    const exportButton = document.getElementById('csv-export-button');
-    if (exportButton) {
-      exportButton.click();
+    const data = exportData();
+    if (data.length > 0) {
+      const csvExportElement = document.createElement('a');
+      const csvContent = 'data:text/csv;charset=utf-8,' + data.map(e => e.address).join('\n');
+      csvExportElement.setAttribute('href', encodeURI(csvContent));
+      csvExportElement.setAttribute('download', 'holders.csv');
+      csvExportElement.click();
+    } else {
+      alert("No data available for export");
     }
     handleCSVClose();
   };
@@ -95,7 +111,7 @@ const Dashboard = () => {
     setNodes(data);
   };
 
-  const exportData = () => {
+  const exportNodes = () => {
     return nodes.map(node => ({ address: node.address, tag: node.tag }));
   };
 
@@ -139,6 +155,7 @@ const Dashboard = () => {
         addNodeField={addNodeField}
         removeNodeField={removeNodeField}
         loading={loading}
+        exportNodes={exportNodes}
       />
       <Box display="flex" flexDirection="row" width="100%" style={{ paddingTop: "40px" }}>
         <Box width="25%">
@@ -148,6 +165,14 @@ const Dashboard = () => {
             onLeaveTokenCount={handleLeaveTokenCount}
             onClickTokenCount={handleClickTokenCount}
           />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={onCSVExportClick}
+            style={{ marginTop: '20px' }}
+          >
+            Export Holders List
+          </Button>
         </Box>
         <Box width="75%">
           {!loading && analysisResults && (
@@ -163,7 +188,7 @@ const Dashboard = () => {
       </Box>
       <div style={{ display: 'none' }}>
         <CSVUpload onUpload={handleCSVUpload} />
-        <CSVExport data={exportData()} filename="nodes.csv" />
+        <CSVExport data={exportNodes()} filename="nodes.csv" />
       </div>
       <LoadingModal open={loading} message="Fetching data... please wait." />
     </div>
