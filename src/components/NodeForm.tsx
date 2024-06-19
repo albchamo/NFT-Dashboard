@@ -63,10 +63,7 @@ const NodeForm: React.FC<NodeFormProps> = ({
   InputProps={{
     style: { color: '#ffffff' },
     classes: {
-      notchedOutline: {
-        borderWidth: '2px',
-        borderColor: '#ffffff',
-      },
+
     },
     sx: {
       '& .MuiOutlinedInput-notchedOutline': {
