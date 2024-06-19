@@ -72,7 +72,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
       y: radius * Math.sin(index * angleStep - Math.PI / 2),
     }));
 
-    console.log('AstroChart Node Data:', nodeData);
 
     // Link Data Preparation
     const linkData: Link[] = analysisResults.linkData.map(link => ({
@@ -81,7 +80,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
       target: nodeData.find(n => n?.id === link.target)!,
     })).filter(link => link.source && link.target);
 
-    console.log('AstroChart Link Data:', linkData);
 
     // Draw Links (Node Relationship View)
     if (viewState === 'Node Relationship View') {
@@ -110,7 +108,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
       .attr('class', 'node')
       .attr('transform', d => `translate(${d.x},${d.y})`)
       .on('click', function(event, d: Node) {
-        console.log(`AstroChart Clicked node: ${d.tag}`);
         router.push(`/single-contract/${d.id}`); // Navigate to the single contract page
 
       });
@@ -163,7 +160,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
     const drawPatterns = (tokenCount: number) => {
       if (!analysisResults.tokenCombinations[tokenCount]) return;
 
-      console.log(`Drawing patterns for ${tokenCount} tokens`);
 
       // Remove previously drawn patterns
       svg.selectAll('.pattern').remove();
@@ -175,11 +171,9 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
         .domain([0, Object.keys(combinations).length - 1]);
 
       Object.keys(combinations).forEach((combinationKey, index) => {
-        console.log(`Combination index: ${index}`); // Add this console log to check the index
         const tokenIds = combinationKey.split('-');
         const positions = tokenIds.map(tokenId => {
           const position = nodeData.find(n => n?.id === tokenId);
-          console.log(`Token ID: ${tokenId}, Position X: ${position?.x}, Position Y: ${position?.y}`);
           return position;
         });
 
@@ -188,7 +182,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
           const pathData: [number, number][] = sortedPositions.map(pos => [pos!.x, pos!.y]);
           pathData.push([sortedPositions[0]!.x, sortedPositions[0]!.y]);
 
-          console.log('Drawing path:', pathData);
 
           svg.append('path')
             .attr('d', d3.line<[number, number]>()(pathData)!)
@@ -244,7 +237,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
     const drawPatterns = (tokenCount: number) => {
       if (!analysisResults.tokenCombinations[tokenCount]) return;
 
-      console.log(`Drawing patterns for ${tokenCount} tokens`);
 
       svg.selectAll('.pattern').remove();
 
@@ -255,11 +247,9 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
         .domain([0, Object.keys(combinations).length - 1]);
 
       Object.keys(combinations).forEach((combinationKey, index) => {
-        console.log(`Combination index: ${index}`); // Add this console log to check the index
         const tokenIds = combinationKey.split('-');
         const positions = tokenIds.map(tokenId => {
           const position = nodeData.find(n => n?.id === tokenId);
-          console.log(`Token ID: ${tokenId}, Position X: ${position?.x}, Position Y: ${position?.y}`);
           return position;
         });
 
@@ -268,7 +258,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
           const pathData: [number, number][] = sortedPositions.map(pos => [pos!.x + centerX, pos!.y + centerY]);
           pathData.push([sortedPositions[0]!.x + centerX, sortedPositions[0]!.y + centerY]);
 
-          console.log('Drawing path:', pathData);
 
           svg.append('path')
             .attr('d', d3.line<[number, number]>()(pathData)!)
@@ -296,7 +285,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 
       // Check if tokenCombinations is defined
       if (tokenCombinations) {
-        console.log('Token Combinations:', tokenCombinations);
 
         // Flatten the combinations and create a set of holders
         const holders = new Set<string>();

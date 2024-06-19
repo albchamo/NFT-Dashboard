@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, Cell, LabelList
 } from 'recharts';
@@ -9,12 +9,16 @@ interface ChartProps {
   analysisResults: AnalysisResults | null;
   onHoverTokenCount: (tokenCount: number) => void;
   onLeaveTokenCount: () => void;
-  onClickTokenCount: (tokenCount: number | null) => void; // Allow null for deactivation
+  onClickTokenCount: (tokenCount: number | null) => void;
 }
 
 const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount, onClickTokenCount }) => {
   const [activeTokenCount, setActiveTokenCount] = useState<number | null>(null);
-  const [isClicked, setIsClicked] = useState<boolean>(false); // Flag to indicate clicked state
+  const [isClicked, setIsClicked] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log('activeTokenCount changed:', activeTokenCount);
+  }, [activeTokenCount]);
 
   if (!analysisResults) return null;
 
@@ -29,19 +33,21 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
 
   const handleClick = (data: any) => {
     const tokenCount = Number(data.name.split(' ')[0]);
+    console.log('Token count clicked:', tokenCount);
     if (activeTokenCount === tokenCount) {
+      console.log('barhcart38');
       setActiveTokenCount(null);
-      setIsClicked(false); // Deactivate the clicked state
-      onClickTokenCount(null); // Reset to default view
+      setIsClicked(false);
+      onClickTokenCount(null);
     } else {
       setActiveTokenCount(tokenCount);
-      setIsClicked(true); // Set the clicked state
+      setIsClicked(true);
       onClickTokenCount(tokenCount);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isClicked) { // Only call onLeaveTokenCount if not in clicked state
+    if (!isClicked) {
       onLeaveTokenCount();
     }
   };

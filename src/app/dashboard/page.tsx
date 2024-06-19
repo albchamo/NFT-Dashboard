@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { getAllHolders } from '../../services/alchemyService';
@@ -19,10 +19,20 @@ const Dashboard = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
   const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
+  const [exportList, setExportList] = useState<Set<string> | null>(null);
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const router = useRouter();
+
+  useEffect(() => {
+    console.log('clickTokenCount changed:', clickTokenCount);
+    if (clickTokenCount !== null && analysisResults) {
+      const holders = analysisResults.holdersByTokenCount[clickTokenCount];
+      console.log(`Holders for Token Count ${clickTokenCount}:`, holders);
+      setExportList(holders || null);
+    }
+  }, [clickTokenCount, analysisResults]);
 
   const toggleDrawer = () => {
     setDrawerOpen(prev => !prev);
@@ -44,30 +54,39 @@ const Dashboard = () => {
     handleCSVClose();
   };
 
-  const exportData = () => {
-    if (!analysisResults) return [];
-
-    let holders: Set<string> | null = null;
-
-    if (clickTokenCount !== null && clickTokenCount > 0) {
-      holders = analysisResults.holdersByTokenCount[clickTokenCount];
-    }
-
-    return Array.from(holders || new Set(Object.keys(analysisResults.holderCounts))).map(holder => ({ address: holder }));
-  };
-
-  const onCSVExportClick = () => {
-    const data = exportData();
-    if (data.length > 0) {
+  // Function to export node data as CSV
+  const onClickNodesExport = () => {
+    console.log('Nodes Export Clicked');
+    const nodeData = exportNodes();
+    console.log('Node Data to be exported:', nodeData);
+    if (nodeData.length > 0) {
       const csvExportElement = document.createElement('a');
-      const csvContent = 'data:text/csv;charset=utf-8,' + data.map(e => e.address).join('\n');
+      const csvContent = 'data:text/csv;charset=utf-8,' + nodeData.map(e => `${e.address},${e.tag}`).join('\n');
       csvExportElement.setAttribute('href', encodeURI(csvContent));
-      csvExportElement.setAttribute('download', 'holders.csv');
+      csvExportElement.setAttribute('download', 'nodes.csv');
       csvExportElement.click();
     } else {
-      alert("No data available for export");
+      alert("No node data available for export");
     }
     handleCSVClose();
+  };
+
+  // Function to handle holders export click
+  const onClickHoldersExport = () => {
+    console.log('Holders Export Clicked');
+    console.log('Current exportList:', exportList);
+
+    if (!exportList || exportList.size === 0) {
+      alert("No holder data available for export");
+      console.log('No holder data available');
+      return;
+    }
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + Array.from(exportList).map(holder => holder).join('\n');
+    const csvExportElement = document.createElement('a');
+    csvExportElement.setAttribute('href', encodeURI(csvContent));
+    csvExportElement.setAttribute('download', 'holders.csv');
+    csvExportElement.click();
   };
 
   const fetchAllHolders = async () => {
@@ -83,6 +102,7 @@ const Dashboard = () => {
         const { allHolders } = await getAllHolders(mainContractAddress, otherContracts);
         const analysis = analyzeHolders(allHolders);
         setAnalysisResults(analysis);
+        console.log('Analysis Results after fetching:', analysis);
       }
     } catch (error) {
       console.error('Error fetching holders:', error);
@@ -124,11 +144,13 @@ const Dashboard = () => {
   };
 
   const handleClickTokenCount = (tokenCount: number | null) => {
+    console.log('Previous Click Token Count:', clickTokenCount);
     if (clickTokenCount === tokenCount) {
       setClickTokenCount(null);
     } else {
       setClickTokenCount(tokenCount);
     }
+    console.log('New Click Token Count set to:', tokenCount);
   };
 
   return (
@@ -137,7 +159,7 @@ const Dashboard = () => {
         onControlClick={toggleDrawer}
         onFetchDataClick={fetchAllHolders}
         onCSVUploadClick={onCSVUploadClick}
-        onCSVExportClick={onCSVExportClick}
+        onCSVExportClick={onClickNodesExport}
         isDrawerOpen={drawerOpen}
       />
       <ContractDrawer
@@ -147,7 +169,7 @@ const Dashboard = () => {
         anchorEl={anchorEl}
         handleCSVClose={handleCSVClose}
         onCSVUploadClick={onCSVUploadClick}
-        onCSVExportClick={onCSVExportClick}
+        onCSVExportClick={onClickNodesExport}
         fetchAllHolders={fetchAllHolders}
         nodes={nodes}
         setNodes={setNodes}
@@ -168,7 +190,7 @@ const Dashboard = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={onCSVExportClick}
+            onClick={onClickHoldersExport} // Ensure the correct exportList is used
             style={{ marginTop: '20px' }}
           >
             Export Holders List
