@@ -180,7 +180,7 @@ const Dashboard = () => {
         exportNodes={exportNodes}
       />
       <Box display="flex" flexDirection="row" width="100%" style={{ paddingTop: "40px" }}>
-        <Box width="25%">
+        <Box width="25%" display="flex" flexDirection="column" alignItems="center">
           <Chart
             analysisResults={analysisResults}
             onHoverTokenCount={handleHoverTokenCount}

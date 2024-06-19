@@ -20,6 +20,8 @@ interface ContractDrawerProps {
   addNodeField: () => void;
   removeNodeField: (index: number) => void;
   loading: boolean;
+  exportNodes: () => { address: string; tag: string }[]; // Add this line
+
 }
 
 const ContractDrawer: React.FC<ContractDrawerProps> = ({

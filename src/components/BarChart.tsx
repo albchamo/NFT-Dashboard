@@ -15,10 +15,16 @@ interface ChartProps {
 const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount, onClickTokenCount }) => {
   const [activeTokenCount, setActiveTokenCount] = useState<number | null>(null);
   const [isClicked, setIsClicked] = useState<boolean>(false);
+  const [totalHolders, setTotalHolders] = useState<number>(0);
 
   useEffect(() => {
-    console.log('activeTokenCount changed:', activeTokenCount);
-  }, [activeTokenCount]);
+    console.log('Active token count changed:', activeTokenCount);
+    if (activeTokenCount !== null && analysisResults) {
+      setTotalHolders(analysisResults.tokenHoldingCounts[activeTokenCount] || 0);
+    } else {
+      setTotalHolders(Object.values(analysisResults?.tokenHoldingCounts || {}).reduce((sum, holders) => sum + holders, 0));
+    }
+  }, [activeTokenCount, analysisResults]);
 
   if (!analysisResults) return null;
 
@@ -29,13 +35,10 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
       holders,
     }));
 
-  const totalHolders = Object.values(analysisResults.tokenHoldingCounts).reduce((sum, holders) => sum + holders, 0);
-
   const handleClick = (data: any) => {
     const tokenCount = Number(data.name.split(' ')[0]);
     console.log('Token count clicked:', tokenCount);
     if (activeTokenCount === tokenCount) {
-      console.log('barhcart38');
       setActiveTokenCount(null);
       setIsClicked(false);
       onClickTokenCount(null);
@@ -73,6 +76,7 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
             dataKey="holders"
             fill="#ffffff"
             barSize={20}
+            minPointSize={50} // Ensures minimum bar size
             onMouseEnter={(data) => {
               const tokenCount = Number(data.name.split(' ')[0]);
               if (tokenCount >= 3) {

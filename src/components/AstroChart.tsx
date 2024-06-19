@@ -319,7 +319,7 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
   return (
     <Box>
       <Typography variant="h4" gutterBottom style={{ textAlign: 'center', paddingBottom: '20px' }}>
-        Contract Relationships ({viewState})
+        Contract Relationships
       </Typography>
       <svg ref={svgRef}></svg>
       {selectedHolders && (
