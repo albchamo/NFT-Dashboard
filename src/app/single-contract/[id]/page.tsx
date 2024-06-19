@@ -10,11 +10,24 @@ import LoadingModal from '../../../components/LoadingModal';
 import CSVExport from '../../../components/CSVExport';
 import { Box, Typography, Button } from "@mui/material";
 
-const SingleContractPage = ({ params }) => {
+interface Params {
+  id: string;
+}
+
+interface TokenMetadataResponse {
+  name: string | null;
+  symbol: string | null;
+}
+
+interface SingleContractPageProps {
+  params: Params;
+}
+
+const SingleContractPage: React.FC<SingleContractPageProps> = ({ params }) => {
   const { id } = params;
   const [loading, setLoading] = useState(false);
   const [holders, setHolders] = useState<Set<string>>(new Set());
-  const [metadata, setMetadata] = useState(null);
+  const [metadata, setMetadata] = useState<TokenMetadataResponse | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -56,13 +69,10 @@ const SingleContractPage = ({ params }) => {
       {loading && <LoadingModal open={loading} message="Fetching data... please wait." />}
       {!loading && (
         <Box sx={{ paddingTop: '5%', paddingLeft: "20%" }}>
-
           {metadata && (
             <Box sx={{ marginBottom: '20px' }}>
-              <Typography variant="body1"><strong>Name:</strong> {metadata.name}</Typography>
-              <Typography variant="body1"><strong>Symbol:</strong> {metadata.symbol}</Typography>
-              <Typography variant="body1"><strong>Total Supply:</strong> {metadata.totalSupply}</Typography>
-              <Typography variant="body1"><strong>Decimals:</strong> {metadata.decimals}</Typography>
+              <Typography variant="body1"><strong>Name:</strong> {metadata.name ?? 'N/A'}</Typography>
+              <Typography variant="body1"><strong>Symbol:</strong> {metadata.symbol ?? 'N/A'}</Typography>
             </Box>
           )}
           <Typography variant="body1"><strong>Contract Address:</strong> {id}</Typography>
@@ -71,7 +81,7 @@ const SingleContractPage = ({ params }) => {
             variant="contained"
             color="primary"
             onClick={() => router.back()}
-            sx={{  marginRight: '10px' }}
+            sx={{ marginRight: '10px' }}
           >
             Back
           </Button>
