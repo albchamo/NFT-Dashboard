@@ -2,8 +2,8 @@ export interface AnalysisResults {
   tokenHoldingCounts: { [key: number]: number };
   holdersByTokenCount: { [key: number]: Set<string> };
   holderCounts: { [address: string]: number };
-  linkData: { source: string, target: string, value: number }[];
-  tokenCombinations: { [key: number]: { [key: string]: Set<string> } }; // Add this line
+  linkData: { source: string, target: string, value: number, addresses: string[] }[];
+  tokenCombinations: { [key: number]: { [key: string]: Set<string> } };
 }
 
 export const analyzeHolders = (
@@ -12,8 +12,8 @@ export const analyzeHolders = (
   const tokenHoldingCounts: { [key: number]: number } = {};
   const holdersByTokenCount: { [key: number]: Set<string> } = {};
   const holderCounts: { [address: string]: number } = {};
-  const linkData: { source: string, target: string, value: number }[] = [];
-  const tokenCombinations: { [key: number]: { [key: string]: Set<string> } } = {}; // Add this line
+  const linkData: { source: string, target: string, value: number, addresses: string[] }[] = [];
+  const tokenCombinations: { [key: number]: { [key: string]: Set<string> } } = {};
 
   const allHolderSet = new Set<string>();
   Object.values(allHolders).forEach(holdersSet => {
@@ -41,9 +41,14 @@ export const analyzeHolders = (
     for (let j = i + 1; j < addresses.length; j++) {
       const commonHolders = new Set(
         [...allHolders[addresses[i]]].filter(x => allHolders[addresses[j]].has(x))
-      ).size;
-      if (commonHolders > 0) {
-        linkData.push({ source: addresses[i], target: addresses[j], value: commonHolders });
+      );
+      if (commonHolders.size > 0) {
+        linkData.push({ 
+          source: addresses[i], 
+          target: addresses[j], 
+          value: commonHolders.size,
+          addresses: Array.from(commonHolders) // Include common holders addresses
+        });
       }
     }
   }
@@ -73,14 +78,14 @@ export const analyzeHolders = (
     holdersByTokenCount,
     holderCounts,
     linkData,
-    tokenCombinations, // Add this line
+    tokenCombinations,
   };
 };
 
 // Helper function to generate combinations
-const getCombinations = (arr: string[], size: number): string[][] => { // Add types here
+const getCombinations = (arr: string[], size: number): string[][] => {
   const result: string[][] = [];
-  const f = (prefix: string[], arr: string[]): void => { // Add types here
+  const f = (prefix: string[], arr: string[]): void => {
     if (prefix.length === size) {
       result.push(prefix);
       return;

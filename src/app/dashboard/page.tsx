@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { getAllHolders } from '../../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../../components/analysisService';
@@ -20,6 +20,7 @@ const Dashboard = () => {
   const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
   const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
   const [exportList, setExportList] = useState<Set<string> | null>(null);
+  const [allHolders, setAllHolders] = useState<Set<string>>(new Set()); // State for all holders
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -31,8 +32,10 @@ const Dashboard = () => {
       const holders = analysisResults.holdersByTokenCount[clickTokenCount];
       console.log(`Holders for Token Count ${clickTokenCount}:`, holders);
       setExportList(holders || null);
+    } else {
+      setExportList(allHolders); // Set exportList to all holders when no token count is selected
     }
-  }, [clickTokenCount, analysisResults]);
+  }, [clickTokenCount, analysisResults, allHolders]);
 
   const toggleDrawer = () => {
     setDrawerOpen(prev => !prev);
@@ -100,6 +103,7 @@ const Dashboard = () => {
         router.push(`/single-contract/${mainContractAddress}`);
       } else {
         const { allHolders } = await getAllHolders(mainContractAddress, otherContracts);
+        setAllHolders(new Set(Object.keys(allHolders))); // Set allHolders state
         const analysis = analyzeHolders(allHolders);
         setAnalysisResults(analysis);
         console.log('Analysis Results after fetching:', analysis);
@@ -144,7 +148,6 @@ const Dashboard = () => {
   };
 
   const handleClickTokenCount = (tokenCount: number | null) => {
-    console.log('Previous Click Token Count:', clickTokenCount);
     if (clickTokenCount === tokenCount) {
       setClickTokenCount(null);
     } else {
@@ -153,13 +156,15 @@ const Dashboard = () => {
     console.log('New Click Token Count set to:', tokenCount);
   };
 
+  const noContractsFetched = nodes.length === 0 || (nodes.length === 1 && !nodes[0].address);
+
   return (
     <div>
       <Header
         onControlClick={toggleDrawer}
         onFetchDataClick={fetchAllHolders}
         onCSVUploadClick={onCSVUploadClick}
-        onCSVExportClick={onClickNodesExport}
+        onCSVExportClick={onClickHoldersExport} // Changed to export the holders list
         isDrawerOpen={drawerOpen}
       />
       <ContractDrawer
@@ -177,37 +182,43 @@ const Dashboard = () => {
         addNodeField={addNodeField}
         removeNodeField={removeNodeField}
         loading={loading}
-        exportNodes={exportNodes}
+        exportNodes={exportNodes} // Ensure exportNodes prop is passed
       />
-      <Box display="flex" flexDirection="row" width="100%" style={{ paddingTop: "40px" }}>
-        <Box width="25%" display="flex" flexDirection="column" alignItems="center">
-          <Chart
-            analysisResults={analysisResults}
-            onHoverTokenCount={handleHoverTokenCount}
-            onLeaveTokenCount={handleLeaveTokenCount}
-            onClickTokenCount={handleClickTokenCount}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={onClickHoldersExport} // Ensure the correct exportList is used
-            style={{ marginTop: '20px' }}
-          >
-            Export Holders List
-          </Button>
+      {noContractsFetched ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="80vh"
+        >
+          <Typography variant="h3">Add one or more contracts </Typography>
         </Box>
-        <Box width="75%">
-          {!loading && analysisResults && (
-            <AstroChart
-              nodes={nodes}
+      ) : (
+        <Box display="flex" flexDirection="row" width="100%" style={{ paddingTop: "40px" }}>
+          <Box width="25%" display="flex" flexDirection="column" alignItems="center">
+            <Chart
               analysisResults={analysisResults}
-              hoverTokenCount={hoverTokenCount}
-              clickTokenCount={clickTokenCount}
-              setClickTokenCount={setClickTokenCount}
+              onHoverTokenCount={handleHoverTokenCount}
+              onLeaveTokenCount={handleLeaveTokenCount}
+              onClickTokenCount={handleClickTokenCount}
+              setExportList={setExportList} // Pass the setExportList function
+
             />
-          )}
+          </Box>
+          <Box width="75%">
+            {!loading && analysisResults && (
+              <AstroChart
+                nodes={nodes}
+                analysisResults={analysisResults}
+                hoverTokenCount={hoverTokenCount}
+                clickTokenCount={clickTokenCount}
+                setClickTokenCount={setClickTokenCount}
+                setExportList={setExportList}
+              />
+            )}
+          </Box>
         </Box>
-      </Box>
+      )}
       <div style={{ display: 'none' }}>
         <CSVUpload onUpload={handleCSVUpload} />
         <CSVExport data={exportNodes()} filename="nodes.csv" />

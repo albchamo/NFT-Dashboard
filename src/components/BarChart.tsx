@@ -10,9 +10,10 @@ interface ChartProps {
   onHoverTokenCount: (tokenCount: number) => void;
   onLeaveTokenCount: () => void;
   onClickTokenCount: (tokenCount: number | null) => void;
+  setExportList: (holders: Set<string>) => void; // Add this prop
 }
 
-const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount, onClickTokenCount }) => {
+const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount, onClickTokenCount, setExportList }) => {
   const [activeTokenCount, setActiveTokenCount] = useState<number | null>(null);
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [totalHolders, setTotalHolders] = useState<number>(0);
@@ -42,10 +43,15 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
       setActiveTokenCount(null);
       setIsClicked(false);
       onClickTokenCount(null);
+      setExportList(new Set()); // Clear export list when no token count is selected
+      console.log('Export list cleared');
     } else {
       setActiveTokenCount(tokenCount);
       setIsClicked(true);
       onClickTokenCount(tokenCount);
+      const holders = analysisResults?.holdersByTokenCount[tokenCount] || new Set();
+      setExportList(holders); // Update export list with holders of the selected token count
+      console.log(`Export list updated for token count ${tokenCount}:`, holders);
     }
   };
 
@@ -58,14 +64,13 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
   return (
     <Box style={{ paddingLeft: "20px" }}>
       <Typography variant="h4" gutterBottom style={{ textAlign: 'center', paddingBottom: "20px" }}>
-        Analysis Console
+        Holders by Token Count
       </Typography>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart layout="vertical" data={barData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis type="number" domain={['auto', 'auto']} scale="log" hide />
           <YAxis dataKey="name" type="category">
-            <Label value="# Tokens" angle={-90} position="insideLeft" style={{ textAnchor: 'middle', fill: '#ffffff' }} />
           </YAxis>
           <Tooltip
             contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', border: 'none' }}
@@ -87,7 +92,7 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
             onClick={handleClick}
           >
             {barData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.name.includes(`${activeTokenCount} Tokens`) ? '#ff0000' : '#ffffff'}>
+              <Cell key={`cell-${index}`} fill={entry.name.includes(`${activeTokenCount} `) ? '#ff0000' : '#ffffff'}>
                 <LabelList
                   dataKey="holders"
                   position="insideRight"
@@ -98,8 +103,11 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      <Typography variant="body1" gutterBottom style={{ textAlign: 'right', paddingTop: '16px' }}>
-        Total Holders: {totalHolders}
+      <Typography variant="body1" gutterBottom style={{ textAlign: 'right', paddingTop: '16px', fontSize: "18px" }}>
+        Holders: {totalHolders}
+      </Typography>
+      <Typography variant="body1" gutterBottom style={{ textAlign: 'right', paddingTop: '16px', fontSize: "18px" }}>
+        Select a number of tokens and export the address list.
       </Typography>
     </Box>
   );

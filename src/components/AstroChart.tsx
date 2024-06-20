@@ -7,7 +7,6 @@ import { scaleSequential } from 'd3-scale';
 import { interpolateBlues } from 'd3-scale-chromatic';
 import { useRouter } from 'next/navigation'; // Import Next.js router
 
-
 interface Node {
   id: string;
   tag: string;
@@ -21,6 +20,7 @@ interface Link {
   source: Node;
   target: Node;
   value: number;
+  addresses: string[]; // Add addresses to the Link interface
 }
 
 interface AstroChartProps {
@@ -29,14 +29,14 @@ interface AstroChartProps {
   hoverTokenCount?: number | null;
   clickTokenCount?: number | null;
   setClickTokenCount: (count: number | null) => void;
+  setExportList: (holders: Set<string>) => void; // Added prop
 }
 
-const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, hoverTokenCount, clickTokenCount, setClickTokenCount }) => {
+const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, hoverTokenCount, clickTokenCount, setClickTokenCount, setExportList }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [selectedHolders, setSelectedHolders] = useState<Set<string> | null>(null);
   const [viewState, setViewState] = useState<'Node Relationship View' | 'Token Combination View'>('Node Relationship View');
   const router = useRouter(); // Initialize the router
-
 
   const linkColorScale = d3.scaleSequential(d3.interpolateBlues)
     .domain([0, d3.max(analysisResults.linkData, d => d.value) || 1]);
@@ -72,14 +72,12 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
       y: radius * Math.sin(index * angleStep - Math.PI / 2),
     }));
 
-
     // Link Data Preparation
     const linkData: Link[] = analysisResults.linkData.map(link => ({
       ...link,
       source: nodeData.find(n => n?.id === link.source)!,
       target: nodeData.find(n => n?.id === link.target)!,
     })).filter(link => link.source && link.target);
-
 
     // Draw Links (Node Relationship View)
     if (viewState === 'Node Relationship View') {
@@ -97,7 +95,12 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
         .attr('stroke-width', d => Math.sqrt(d.value) / 4)
         .attr('stroke', d => linkColorScale(d.value))
         .attr('fill', 'none')
-        .attr('stroke-opacity', 0.9);
+        .attr('stroke-opacity', 0.9)
+        .on('click', function(event, d: Link) {
+          console.log(`Link clicked between ${d.source.id} and ${d.target.id}`);
+          console.log('Common holders:', d.addresses);
+          setExportList(new Set(d.addresses)); // Update export list on link click
+        });
     }
 
     // Draw Nodes
@@ -109,7 +112,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
       .attr('transform', d => `translate(${d.x},${d.y})`)
       .on('click', function(event, d: Node) {
         router.push(`/single-contract/${d.id}`); // Navigate to the single contract page
-
       });
 
     nodesGroup.append('circle')
@@ -160,7 +162,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
     const drawPatterns = (tokenCount: number) => {
       if (!analysisResults.tokenCombinations[tokenCount]) return;
 
-
       // Remove previously drawn patterns
       svg.selectAll('.pattern').remove();
 
@@ -181,7 +182,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
           const sortedPositions = positions.sort((a, b) => (a!.angle - b!.angle));
           const pathData: [number, number][] = sortedPositions.map(pos => [pos!.x, pos!.y]);
           pathData.push([sortedPositions[0]!.x, sortedPositions[0]!.y]);
-
 
           svg.append('path')
             .attr('d', d3.line<[number, number]>()(pathData)!)
@@ -237,7 +237,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
     const drawPatterns = (tokenCount: number) => {
       if (!analysisResults.tokenCombinations[tokenCount]) return;
 
-
       svg.selectAll('.pattern').remove();
 
       const combinations = analysisResults.tokenCombinations[tokenCount];
@@ -257,7 +256,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
           const sortedPositions = positions.sort((a, b) => (a!.angle - b!.angle));
           const pathData: [number, number][] = sortedPositions.map(pos => [pos!.x + centerX, pos!.y + centerY]);
           pathData.push([sortedPositions[0]!.x + centerX, sortedPositions[0]!.y + centerY]);
-
 
           svg.append('path')
             .attr('d', d3.line<[number, number]>()(pathData)!)
@@ -285,7 +283,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 
       // Check if tokenCombinations is defined
       if (tokenCombinations) {
-
         // Flatten the combinations and create a set of holders
         const holders = new Set<string>();
         Object.values(tokenCombinations).forEach((comb: Set<string>) => {
@@ -293,14 +290,16 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
         });
 
         setSelectedHolders(holders);
+        setExportList(holders); // Update export list on token count click
       } else {
         setSelectedHolders(null);
       }
     } else {
       setViewState('Node Relationship View');
       setSelectedHolders(null);
+      setExportList(new Set()); // Clear export list when no token count is selected
     }
-  }, [clickTokenCount, analysisResults.tokenCombinations]);
+  }, [clickTokenCount, analysisResults.tokenCombinations, setExportList]);
 
   // Handle Click Outside
   const handleClickOutside = useCallback((event: MouseEvent) => {
@@ -318,9 +317,6 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom style={{ textAlign: 'center', paddingBottom: '20px' }}>
-        Contract Relationships
-      </Typography>
       <svg ref={svgRef}></svg>
       {selectedHolders && (
         <Box mt={2}>
