@@ -1,4 +1,3 @@
-// src/app/dashboard/page.tsx
 'use client';
 
 import React from 'react';
@@ -17,7 +16,6 @@ const Dashboard = () => {
     nodes,
     setNodes,
     loading,
-    drawerOpen,
     hoverTokenCount,
     clickTokenCount,
     exportList,
@@ -25,7 +23,6 @@ const Dashboard = () => {
     allHolders,
     analysisResults,
     anchorEl,
-    toggleDrawer,
     handleCSVClick,
     handleCSVClose,
     onCSVUploadClick,
@@ -40,43 +37,25 @@ const Dashboard = () => {
     handleHoverTokenCount,
     handleLeaveTokenCount,
     handleClickTokenCount,
+    drawerOpen,
     noContractsFetched
   } = useDashboard();
 
   return (
     <div>
       <Header
-        onControlClick={toggleDrawer}
-        onFetchDataClick={fetchAllHolders}
-        onCSVUploadClick={onCSVUploadClick}
-        onCSVExportClick={onClickHoldersExport}
-        isDrawerOpen={drawerOpen}
       />
-      <ContractDrawer
-        drawerOpen={drawerOpen}
-        toggleDrawer={toggleDrawer}
-        handleCSVClick={handleCSVClick}
-        anchorEl={anchorEl}
-        handleCSVClose={handleCSVClose}
-        onCSVUploadClick={onCSVUploadClick}
-        onCSVExportClick={onClickNodesExport}
-        fetchAllHolders={fetchAllHolders}
-        nodes={nodes}
-        setNodes={setNodes} // This line was missing
-        handleNodeChange={updateNodeField}
-        addNodeField={addNodeField}
-        removeNodeField={removeNodeField}
-        loading={loading}
-        exportNodes={exportNodes} // Ensure exportNodes prop is passed
-      />
+      <ContractDrawer />
       {noContractsFetched ? (
         <Box
           display="flex"
+          flexDirection="column"
           justifyContent="center"
           alignItems="center"
           height="80vh"
         >
-          <Typography variant="h3">Add one or more contracts </Typography>
+          <Typography variant="h3">Welcome to Snapshooter. </Typography>
+          <Typography variant="body1">Add contracts to begin to explore.</Typography>
         </Box>
       ) : (
         <Box display="flex" flexDirection="row" width="100%" style={{ paddingTop: "40px" }}>

@@ -1,21 +1,10 @@
 import React from 'react';
 import { AppBar, Toolbar, Button } from '@mui/material';
+import { useDashboard } from '../hooks/useDashboard';
 
-interface HeaderProps {
-  onControlClick: () => void;
-  onFetchDataClick: () => void;
-  onCSVUploadClick: () => void;
-  onCSVExportClick: () => void;
-  isDrawerOpen: boolean;
-}
+const Header = () => {
+  const { toggleDrawer, drawerOpen, onClickNodesExport } = useDashboard();
 
-const Header = ({
-  onControlClick,
-  onFetchDataClick,
-  onCSVUploadClick,
-  onCSVExportClick,
-  isDrawerOpen
-}: HeaderProps) => {
   return (
     <AppBar
       position="fixed"
@@ -23,7 +12,7 @@ const Header = ({
     >
       <Toolbar style={{ display: 'flex', justifyContent: 'center' }}>
         <Button
-          onClick={onControlClick}
+          onClick={toggleDrawer}
           style={{
             borderColor: '#ffffff',
             color: '#ffffff',
@@ -35,10 +24,10 @@ const Header = ({
             borderRadius: "12px",
           }}
         >
-          {isDrawerOpen ? 'Close' : 'Contracts'}
+          {drawerOpen ? 'Close' : 'Contracts'}
         </Button>
         <Button
-          onClick={onCSVExportClick} // This will trigger the export function passed as a prop
+          onClick={onClickNodesExport} // Ensure this is correctly named
           style={{
             borderColor: '#ffffff',
             color: '#ffffff',

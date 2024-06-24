@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAllHolders } from '../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../components/analysisService';
+import { getNodesFromUrl, updateUrlParams } from '../utils/urlUtils';
 
 export const useDashboard = () => {
-  const [nodes, setNodes] = useState([{ address: '', tag: '' }]);
+  const [nodes, setNodes] = useState<{ address: string; tag: string }[]>(getNodesFromUrl);
   const [loading, setLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
@@ -14,7 +15,11 @@ export const useDashboard = () => {
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const router = useRouter();
+  const router = useRouter();  // Define the router
+
+  useEffect(() => {
+    updateUrlParams(router, nodes);
+  }, [nodes, router]);
 
   useEffect(() => {
     if (clickTokenCount !== null && analysisResults) {
@@ -100,6 +105,12 @@ export const useDashboard = () => {
     setNodes(updatedNodes);
   };
 
+  const handleNodeChange = (index: number, field: 'address' | 'tag', value: string) => {
+    const updatedNodes = [...nodes];
+    updatedNodes[index][field] = value;
+    setNodes(updatedNodes);
+  };
+
   const addNodeField = () => {
     setNodes([...nodes, { address: '', tag: '' }]);
   };
@@ -156,6 +167,7 @@ export const useDashboard = () => {
     onClickHoldersExport,
     fetchAllHolders,
     updateNodeField,
+    handleNodeChange,
     addNodeField,
     removeNodeField,
     handleCSVUpload,

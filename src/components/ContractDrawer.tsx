@@ -2,33 +2,28 @@ import React from 'react';
 import { Box, Drawer, Button, Menu, MenuItem, Typography } from "@mui/material";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import NodeForm from './NodeForm';
-import CSVExport from './CSVExport'; // Import CSVExport
+import CSVExport from './CSVExport';
+import { useDashboard } from '../hooks/useDashboard';
 
+const ContractDrawer: React.FC = () => {
+  const {
+    drawerOpen,
+    toggleDrawer,
+    handleCSVClick,
+    anchorEl,
+    handleCSVClose,
+    onCSVUploadClick,
+    onClickNodesExport,
+    fetchAllHolders,
+    nodes,
+    setNodes,
+    handleNodeChange,
+    addNodeField,
+    removeNodeField,
+    loading,
+    exportNodes
+  } = useDashboard();
 
-interface ContractDrawerProps {
-  drawerOpen: boolean;
-  toggleDrawer: () => void;
-  handleCSVClick: (event: React.MouseEvent<HTMLElement>) => void;
-  anchorEl: HTMLElement | null;
-  handleCSVClose: () => void;
-  onCSVUploadClick: () => void;
-  onCSVExportClick: () => void;
-  fetchAllHolders: () => void;
-  nodes: { address: string; tag: string }[];
-  setNodes: React.Dispatch<React.SetStateAction<{ address: string; tag: string }[]>>;
-  handleNodeChange: (index: number, field: 'address' | 'tag', value: string) => void;
-  addNodeField: () => void;
-  removeNodeField: (index: number) => void;
-  loading: boolean;
-  exportNodes: () => { address: string; tag: string }[]; // Add this line
-
-}
-
-const ContractDrawer: React.FC<ContractDrawerProps> = ({
-  drawerOpen, toggleDrawer, handleCSVClick, anchorEl, handleCSVClose,
-  onCSVUploadClick, onCSVExportClick, fetchAllHolders, nodes, setNodes,
-  handleNodeChange, addNodeField, removeNodeField, loading
-}) => {
   return (
     <Drawer
       anchor="top"
@@ -78,7 +73,7 @@ const ContractDrawer: React.FC<ContractDrawerProps> = ({
             PaperProps={{ style: { backgroundColor: '#ffffff', color: '#000000' } }}
           >
             <MenuItem onClick={onCSVUploadClick} style={{ color: '#000000' }}>Upload List</MenuItem>
-            <MenuItem onClick={onCSVExportClick} style={{ color: '#000000' }}>Export List</MenuItem>
+            <MenuItem onClick={onClickNodesExport} style={{ color: '#000000' }}>Export List</MenuItem>
           </Menu>
           <Button
             onClick={toggleDrawer}
@@ -123,8 +118,7 @@ const ContractDrawer: React.FC<ContractDrawerProps> = ({
           fetchAllHolders={fetchAllHolders}
           loading={loading}
         />
-                <CSVExport data={nodes.map(node => ({ address: node.address, tag: node.tag }))} filename="nodes.csv" />
-
+        <CSVExport data={nodes.map(node => ({ address: node.address, tag: node.tag }))} filename="nodes.csv" />
       </Box>
     </Drawer>
   );
