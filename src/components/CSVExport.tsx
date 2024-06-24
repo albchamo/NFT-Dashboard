@@ -10,6 +10,8 @@ interface CSVExportProps {
 }
 
 const CSVExport: React.FC<CSVExportProps> = ({ data, filename }) => {
+  console.log('CSVExport data:', data); // Add log for CSVExport data
+
   return (
     <CSVLink data={data} filename={filename} style={{ color: 'white', textDecoration: 'none' }}>
       <Button variant="contained" color="primary" id="csv-export-button">

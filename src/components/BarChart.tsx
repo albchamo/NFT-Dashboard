@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, Cell, LabelList
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell
 } from 'recharts';
 import { AnalysisResults } from '../components/analysisService';
 import { Box, Typography } from '@mui/material';
 
 interface ChartProps {
   analysisResults: AnalysisResults | null;
-  onHoverTokenCount: (tokenCount: number) => void;
-  onLeaveTokenCount: () => void;
   onClickTokenCount: (tokenCount: number | null) => void;
-  setExportList: (holders: Set<string>) => void;
-  allHolders: Set<string>; // Add this prop
+  setExportListToTokenCount: (tokenCount: number) => void; // Use the function here
+  resetExportList: () => void;
 }
 
-const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount, onClickTokenCount, setExportList, allHolders }) => {
+const Chart: React.FC<ChartProps> = ({ analysisResults, onClickTokenCount, setExportListToTokenCount, resetExportList }) => {
   const [activeTokenCount, setActiveTokenCount] = useState<number | null>(null);
-  const [isClicked, setIsClicked] = useState<boolean>(false);
   const [totalHolders, setTotalHolders] = useState<number>(0);
 
   useEffect(() => {
@@ -42,29 +39,20 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
     console.log('Token count clicked:', tokenCount);
     if (activeTokenCount === tokenCount) {
       setActiveTokenCount(null);
-      setIsClicked(false);
       onClickTokenCount(null);
-      setExportList(allHolders); // Reset to allHolders when no token count is selected
-      console.log('Export list reset to all holders:', allHolders);
+      resetExportList(); // Reset to allHolders when no token count is selected
+      console.log('Export list reset to all holders:');
     } else {
       setActiveTokenCount(tokenCount);
-      setIsClicked(true);
       onClickTokenCount(tokenCount);
-      const holders = analysisResults?.holdersByTokenCount[tokenCount] || new Set();
-      setExportList(holders); // Update export list with holders of the selected token count
-      console.log(`Export list updated for token count ${tokenCount}:`, holders);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (!isClicked) {
-      onLeaveTokenCount();
+      setExportListToTokenCount(tokenCount); // Update export list with holders of the selected token count
+      console.log(`Export list updated for token count ${tokenCount}`);
     }
   };
 
   return (
-    <Box style={{ paddingLeft: "20px" }}>
-      <Typography variant="h4" gutterBottom style={{ textAlign: 'center', paddingBottom: "20px" }}>
+    <Box style={{ paddingLeft: '20px' }}>
+      <Typography variant="h4" gutterBottom style={{ textAlign: 'center', paddingBottom: '20px' }}>
         Holders by Token Count
       </Typography>
       <ResponsiveContainer width="100%" height={300}>
@@ -83,13 +71,6 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
             fill="#ffffff"
             barSize={20}
             minPointSize={50} // Ensures minimum bar size
-            onMouseEnter={(data) => {
-              const tokenCount = Number(data.name.split(' ')[0]);
-              if (tokenCount >= 3) {
-                onHoverTokenCount(tokenCount);
-              }
-            }}
-            onMouseLeave={handleMouseLeave}
             onClick={handleClick}
           >
             {barData.map((entry, index) => (
@@ -104,11 +85,8 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      <Typography variant="body1" gutterBottom style={{ textAlign: 'right', paddingTop: '16px', fontSize: "18px" }}>
+      <Typography variant="body1" gutterBottom style={{ textAlign: 'right', paddingTop: '16px', fontSize: '18px' }}>
         Holders: {totalHolders}
-      </Typography>
-      <Typography variant="body1" gutterBottom style={{ textAlign: 'right', paddingTop: '16px', fontSize: "18px" }}>
-        Select a number of tokens and export the address list.
       </Typography>
     </Box>
   );

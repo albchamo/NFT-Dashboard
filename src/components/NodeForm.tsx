@@ -13,8 +13,6 @@ interface NodeFormProps {
   handleNodeChange: (index: number, field: 'address' | 'tag', value: string) => void;
   addNodeField: () => void;
   removeNodeField: (index: number) => void;
-  fetchAllHolders: () => void;
-  loading: boolean;
 }
 
 const NodeForm: React.FC<NodeFormProps> = ({
@@ -23,8 +21,6 @@ const NodeForm: React.FC<NodeFormProps> = ({
   handleNodeChange,
   addNodeField,
   removeNodeField,
-  fetchAllHolders,
-  loading,
 }) => {
   const onDragEnd = (result: any) => {
     if (!result.destination) return;

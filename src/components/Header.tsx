@@ -3,13 +3,17 @@
 import React from 'react';
 import { AppBar, Toolbar, Button } from '@mui/material';
 import { useDashboard } from '../hooks/useDashboard';
+import CSVExport from './CSVExport';
 import { useDrawer } from '../context/DrawerContext';
 
 const Header = () => {
-  const { onClickHoldersExport, exportList } = useDashboard();
+  const { exportList } = useDashboard();
   const { isDrawerOpen, toggleDrawer } = useDrawer();
 
-  console.log('Header exportList:', exportList); // Add log for exportList in Header
+  console.log('Header exportList:', Array.from(exportList)); // Inspect exportList
+
+  // Transform exportList to the required structure
+  const exportData = Array.from(exportList).map(holder => ({ holder }));
 
   return (
     <AppBar
@@ -32,25 +36,13 @@ const Header = () => {
         >
           {isDrawerOpen ? 'Close' : 'Contracts'}
         </Button>
-        <Button
-          onClick={onClickHoldersExport}
-          style={{
-            borderColor: '#ffffff',
-            color: '#ffffff',
-            borderWidth: '3px',
-            borderStyle: 'solid',
-            padding: '12px 18px',
-            margin: '0 12px',
-            fontSize: "18px",
-            borderRadius: "12px",
-          }}
-        >
-          Export List
-        </Button>
+        <CSVExport
+          data={exportData} // Ensure exportList is transformed to the required structure
+          filename="holders.csv"
+        />
       </Toolbar>
     </AppBar>
   );
 };
 
 export default Header;
-

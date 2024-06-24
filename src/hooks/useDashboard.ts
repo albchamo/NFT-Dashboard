@@ -6,19 +6,18 @@ import { getAllHolders } from '../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../components/analysisService';
 import { getNodesFromUrl, updateUrlParams } from '../utils/urlUtils';
 import { useDrawer } from '../context/DrawerContext';
+import { Node, Link, TokenCombination } from '../components/AstroChartTypes';
 
 export const useDashboard = () => {
   const [nodes, setNodes] = useState<{ address: string; tag: string }[]>(getNodesFromUrl());
   const [loading, setLoading] = useState(false);
-  const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
   const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
   const [exportList, setExportList] = useState<Set<string>>(new Set());
   const [allHolders, setAllHolders] = useState<Set<string>>(new Set());
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const { toggleDrawer, closeDrawer } = useDrawer();
-  const router = useRouter(); 
+  const { closeDrawer } = useDrawer();
+  const router = useRouter();
 
   useEffect(() => {
     updateUrlParams(router, nodes);
@@ -27,56 +26,19 @@ export const useDashboard = () => {
   useEffect(() => {
     if (clickTokenCount !== null && analysisResults) {
       const holders = analysisResults.holdersByTokenCount[clickTokenCount];
-      setExportList(holders || allHolders);  // Fall back to allHolders if holders is undefined or null
+      setExportList(holders || allHolders);
       console.log(`Export list updated for token count ${clickTokenCount}:`, holders || allHolders);
     } else {
-      setExportList(allHolders);  // Reset to allHolders if no token count is selected
+      setExportList(allHolders);
       console.log('Export list reset to all holders:', allHolders);
     }
   }, [clickTokenCount, analysisResults, allHolders]);
 
-  const handleCSVClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCSVClose = () => {
-    setAnchorEl(null);
-  };
-
-  const onCSVUploadClick = () => {
-    const uploadButton = document.getElementById('csv-upload-button');
-    if (uploadButton) {
-      uploadButton.click();
+  useEffect(() => {
+    if (nodes.length > 0 && nodes[0].address) {
+      fetchAllHolders();
     }
-    handleCSVClose();
-  };
-
-  const onClickNodesExport = () => {
-    const nodeData = exportNodes();
-    if (nodeData.length > 0) {
-      const csvExportElement = document.createElement('a');
-      const csvContent = 'data:text/csv;charset=utf-8,' + nodeData.map(e => `${e.address},${e.tag}`).join('\n');
-      csvExportElement.setAttribute('href', encodeURI(csvContent));
-      csvExportElement.setAttribute('download', 'nodes.csv');
-      csvExportElement.click();
-    } else {
-      alert("No node data available for export");
-    }
-    handleCSVClose();
-  };
-
-  const onClickHoldersExport = () => {
-    if (exportList.size === 0) {
-      alert("No holder data available for export");
-      return;
-    }
-
-    const csvContent = 'data:text/csv;charset=utf-8,' + Array.from(exportList).map(holder => holder).join('\n');
-    const csvExportElement = document.createElement('a');
-    csvExportElement.setAttribute('href', encodeURI(csvContent));
-    csvExportElement.setAttribute('download', 'holders.csv');
-    csvExportElement.click();
-  };
+  }, [nodes]);
 
   const fetchAllHolders = async () => {
     setLoading(true);
@@ -94,23 +56,26 @@ export const useDashboard = () => {
 
       console.log('Fetching holders for contracts:', mainContractAddress, otherContracts);
 
-      const { allHolders } = await getAllHolders(mainContractAddress, otherContracts);
-      console.log('Fetched all holders:', allHolders);
+      const allHoldersData = await getAllHolders(mainContractAddress, otherContracts);
+      console.log('Fetched all holders:', allHoldersData);
 
-      const holderSet = new Set(Object.keys(allHolders));
-      console.log('Holder set:', holderSet);
+      const allHolders = new Set<string>();
+      Object.values(allHoldersData.allHolders).forEach(holdersSet => {
+        holdersSet.forEach(holder => allHolders.add(holder));
+      });
 
-      setAllHolders(holderSet);
-      console.log('All holders state set:', holderSet);
+      console.log('All holders state set:', allHolders);
 
-      const analysis = analyzeHolders(allHolders);
+      setAllHolders(allHolders);
+
+      const analysis = analyzeHolders(allHoldersData.allHolders);
       console.log('Analysis results:', analysis);
 
       setAnalysisResults(analysis);
       console.log('Set analysisResults:', analysis);
 
-      setExportList(holderSet); // Ensure exportList is updated with allHolders
-      console.log('Set exportList to allHolders:', holderSet);
+      setExportList(allHolders);
+      console.log('Set exportList to allHolders:', allHolders);
     } catch (error) {
       console.error('Error fetching holders:', error);
     } finally {
@@ -142,55 +107,45 @@ export const useDashboard = () => {
     return nodes.map(node => ({ address: node.address, tag: node.tag }));
   };
 
-  const handleHoverTokenCount = (tokenCount: number | null) => {
-    setHoverTokenCount(tokenCount);
-  };
-
-  const handleLeaveTokenCount = () => {
-    setHoverTokenCount(null);
-  };
-
-  const handleClickTokenCount = (tokenCount: number | null) => {
-    if (clickTokenCount === tokenCount) {
-      setClickTokenCount(null);
-    } else {
-      setClickTokenCount(tokenCount);
+  const setExportListToTokenCount = (tokenCount: number) => {
+    if (analysisResults) {
+      const holders = analysisResults.holdersByTokenCount[tokenCount];
+      setExportList(holders || allHolders);
+      console.log(`Export list updated for token count ${tokenCount}:`, holders || allHolders);
     }
   };
 
-  const noContractsFetched = nodes.length === 0 || (nodes.length === 1 && !nodes[0].address);
+  const setExportListToLink = (link: Link) => {
+    const holders = new Set(link.addresses);
+    setExportList(holders);
+    console.log('Export list updated for link:', holders);
+  };
 
-  console.log('noContractsFetched:', noContractsFetched);
-  console.log('nodes:', nodes);
-  console.log('loading:', loading);
-  console.log('analysisResults:', analysisResults);
-  console.log('exportList:', exportList); // Add console log for exportList
+  const resetExportList = () => {
+    setExportList(allHolders);
+    console.log('Export list reset to all holders:', allHolders);
+  };
+
+  const noContractsFetched = nodes.length === 0 || (nodes.length === 1 && !nodes[0].address);
 
   return {
     nodes,
     setNodes,
     loading,
-    hoverTokenCount,
     clickTokenCount,
     exportList,
-    setExportList,
+    setExportListToTokenCount,
+    setExportListToLink,
+    resetExportList,
     allHolders,
     analysisResults,
-    anchorEl,
-    handleCSVClick,
-    handleCSVClose,
-    onCSVUploadClick,
-    onClickNodesExport,
-    onClickHoldersExport,
+    handleClickTokenCount: setClickTokenCount,
+    noContractsFetched,
     fetchAllHolders,
     handleNodeChange,
     addNodeField,
     removeNodeField,
     handleCSVUpload,
     exportNodes,
-    handleHoverTokenCount,
-    handleLeaveTokenCount,
-    handleClickTokenCount,
-    noContractsFetched
   };
 };
