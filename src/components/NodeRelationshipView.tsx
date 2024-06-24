@@ -39,6 +39,7 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
     svg
       .attr('width', width)
       .attr('height', height)
+      .attr('viewBox', `0 0 ${width} ${height}`)
       .style('background-color', '#000')
       .append('g')
       .attr('transform', `translate(${centerX},${centerY})`);
@@ -124,7 +125,7 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
     };
   }, [nodes, links, linkColorScale, selectedLink, setSelectedLink, setExportListToLink, resetExportList]);
 
-  return <Box><svg ref={svgRef}></svg></Box>;
+  return <Box width="100%" height="100%" overflow="hidden"><svg ref={svgRef}></svg></Box>;
 };
 
 export default NodeRelationshipView;

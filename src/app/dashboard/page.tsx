@@ -76,6 +76,8 @@ const Dashboard = () => {
                 flexDirection="column"
                 alignItems="center"
                 justifyContent="center" // Center content vertically
+                style={{ overflow: 'hidden' }}
+
               >
                 <AstroChart
                   nodes={nodes}

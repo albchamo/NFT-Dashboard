@@ -58,7 +58,7 @@ const TokenCombinationView: React.FC<TokenCombinationViewProps> = ({
     };
   }, [nodes, tokenCombinations, tokenCount]);
 
-  return <svg ref={svgRef} width="100%" height="500px"></svg>;
+  return <Box width="100%" height="100%" overflow="hidden"><svg ref={svgRef} width="100%" height="100%" viewBox="0 0 900 540"></svg></Box>;
 };
 
 export default TokenCombinationView;

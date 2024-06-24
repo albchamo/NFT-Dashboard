@@ -1,23 +1,33 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; 
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getAllHolders } from '../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../components/analysisService';
 import { getNodesFromUrl, updateUrlParams } from '../utils/urlUtils';
 import { useDrawer } from '../context/DrawerContext';
-import { Node, Link, TokenCombination } from '../components/AstroChartTypes';
+import { Node, Link } from '../components/AstroChartTypes';
 
 export const useDashboard = () => {
-  const [nodes, setNodes] = useState<{ address: string; tag: string }[]>(getNodesFromUrl());
+  const searchParams = useSearchParams();
+  const [nodes, setNodes] = useState<{ address: string; tag: string }[]>(() => getNodesFromUrl());
   const [loading, setLoading] = useState(false);
   const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
   const [exportList, setExportList] = useState<Set<string>>(new Set());
   const [allHolders, setAllHolders] = useState<Set<string>>(new Set());
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
+  const [initialFetch, setInitialFetch] = useState<boolean>(true);
 
   const { closeDrawer } = useDrawer();
   const router = useRouter();
+
+  // Fetch all holders when the component mounts if nodes are available in the URL
+  useEffect(() => {
+    if (initialFetch && nodes.length > 0 && nodes[0].address) {
+      fetchAllHolders();
+      setInitialFetch(false); // Ensure this runs only once
+    }
+  }, [nodes, initialFetch]);
 
   useEffect(() => {
     updateUrlParams(router, nodes);
@@ -33,12 +43,6 @@ export const useDashboard = () => {
       console.log('Export list reset to all holders:', allHolders);
     }
   }, [clickTokenCount, analysisResults, allHolders]);
-
-  useEffect(() => {
-    if (nodes.length > 0 && nodes[0].address) {
-      fetchAllHolders();
-    }
-  }, [nodes]);
 
   const fetchAllHolders = async () => {
     setLoading(true);
@@ -83,30 +87,6 @@ export const useDashboard = () => {
     }
   };
 
-  const handleNodeChange = (index: number, field: 'address' | 'tag', value: string) => {
-    const updatedNodes = [...nodes];
-    updatedNodes[index][field] = value;
-    setNodes(updatedNodes);
-  };
-
-  const addNodeField = () => {
-    setNodes([...nodes, { address: '', tag: '' }]);
-  };
-
-  const removeNodeField = (index: number) => {
-    const updatedNodes = [...nodes];
-    updatedNodes.splice(index, 1);
-    setNodes(updatedNodes);
-  };
-
-  const handleCSVUpload = (data: { address: string; tag: string }[]) => {
-    setNodes(data);
-  };
-
-  const exportNodes = () => {
-    return nodes.map(node => ({ address: node.address, tag: node.tag }));
-  };
-
   const setExportListToTokenCount = (tokenCount: number) => {
     if (analysisResults) {
       const holders = analysisResults.holdersByTokenCount[tokenCount];
@@ -130,7 +110,7 @@ export const useDashboard = () => {
 
   return {
     nodes,
-    setNodes,
+    setNodes, // Ensure setNodes is returned so it can be used to update the URL
     loading,
     clickTokenCount,
     exportList,
@@ -141,11 +121,5 @@ export const useDashboard = () => {
     analysisResults,
     handleClickTokenCount: setClickTokenCount,
     noContractsFetched,
-    fetchAllHolders,
-    handleNodeChange,
-    addNodeField,
-    removeNodeField,
-    handleCSVUpload,
-    exportNodes,
   };
 };

@@ -1,28 +1,47 @@
 "use client"; 
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Drawer, Button, Typography } from "@mui/material";
 import NodeForm from './NodeForm';
 import CSVExport from './CSVExport';
 import CSVUpload from './CSVUpload'; 
 import { useDrawer } from '../context/DrawerContext';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { getNodesFromUrl, updateUrlParams } from '../utils/urlUtils';
 import { useDashboard } from '../hooks/useDashboard';
 
 const ContractDrawer: React.FC = () => {
   const { isDrawerOpen, toggleDrawer } = useDrawer();
-  const {
-    nodes,
-    setNodes,
-    handleNodeChange,
-    addNodeField,
-    removeNodeField,
-    loading,
-    handleCSVUpload,
-    exportNodes
-  } = useDashboard();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
+  const [nodes, setNodes] = useState<{ address: string; tag: string }[]>(() => getNodesFromUrl());
+
+  useEffect(() => {
+    updateUrlParams(router, nodes);
+  }, [nodes, router]);
+
+  const handleNodeChange = (index: number, field: 'address' | 'tag', value: string) => {
+    const updatedNodes = [...nodes];
+    updatedNodes[index][field] = value;
+    setNodes(updatedNodes);
+  };
+
+  const addNodeField = () => {
+    setNodes([...nodes, { address: '', tag: '' }]);
+  };
+
+  const removeNodeField = (index: number) => {
+    const updatedNodes = [...nodes];
+    updatedNodes.splice(index, 1);
+    setNodes(updatedNodes);
+  };
+
+  const handleCSVUpload = (data: { address: string; tag: string }[]) => {
+    setNodes(data);
+  };
   const refreshPage = () => {
-    window.location.reload();
+    window.location.reload(); // This will reload the page with the updated URL
   };
 
   return (
@@ -66,7 +85,7 @@ const ContractDrawer: React.FC = () => {
             {isDrawerOpen ? 'Close Control' : 'Open Control'}
           </Button>
           <Button
-            onClick={refreshPage}
+            onClick={refreshPage} // Manually trigger the fetch function
             style={{
               borderColor: '#fff',
               color: '#fff',
@@ -99,4 +118,3 @@ const ContractDrawer: React.FC = () => {
 };
 
 export default ContractDrawer;
-

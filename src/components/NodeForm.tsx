@@ -1,8 +1,7 @@
-// NodeForm.tsx
 'use client';
 
 import React from 'react';
-import { TextField, IconButton, Button, Box } from '@mui/material';
+import { TextField, IconButton, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -49,61 +48,56 @@ const NodeForm: React.FC<NodeFormProps> = ({
                     marginBottom="8px"
                     style={{ padding: '0 40px', borderRadius: '4px' }}
                   >
-<TextField
-  label={`Node ${index + 1} Contract Address`}
-  value={node.address}
-  onChange={(e) => handleNodeChange(index, 'address', e.target.value)}
-  margin="normal"
-  style={{ flex: 2 }}
-  InputLabelProps={{ style: { color: '#ffffff' } }}
-  InputProps={{
-    style: { color: '#ffffff' },
-    classes: {
-
-    },
-    sx: {
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#ffffff',
-        borderWidth: '2px', // Adjust the border width here
-      },
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#ffffff',
-        borderWidth: '2px', // Adjust the border width on hover
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#ffffff',
-        borderWidth: '2px', // Adjust the border width when focused
-      },
-    },
-  }}
-/>
-
-<TextField
-  label="Name"
-  value={node.tag}
-  onChange={(e) => handleNodeChange(index, 'tag', e.target.value)}
-  margin="normal"
-  style={{ flex: 1, marginLeft: '10px' }}
-  InputLabelProps={{ style: { color: '#ffffff' } }}
-  InputProps={{
-    style: { color: '#ffffff' },
-    sx: {
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#ffffff',
-        borderWidth: '2px', // Adjust the border width here
-      },
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#ffffff',
-        borderWidth: '2px', // Adjust the border width on hover
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#ffffff',
-        borderWidth: '2px', // Adjust the border width when focused
-      },
-    },
-  }}
-/>
-
+                    <TextField
+                      label={`Node ${index + 1} Contract Address`}
+                      value={node.address}
+                      onChange={(e) => handleNodeChange(index, 'address', e.target.value)}
+                      margin="normal"
+                      style={{ flex: 2 }}
+                      InputLabelProps={{ style: { color: '#ffffff' } }}
+                      InputProps={{
+                        style: { color: '#ffffff' },
+                        sx: {
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffffff',
+                            borderWidth: '2px', // Adjust the border width here
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffffff',
+                            borderWidth: '2px', // Adjust the border width on hover
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffffff',
+                            borderWidth: '2px', // Adjust the border width when focused
+                          },
+                        },
+                      }}
+                    />
+                    <TextField
+                      label="Name"
+                      value={node.tag}
+                      onChange={(e) => handleNodeChange(index, 'tag', e.target.value)}
+                      margin="normal"
+                      style={{ flex: 1, marginLeft: '10px' }}
+                      InputLabelProps={{ style: { color: '#ffffff' } }}
+                      InputProps={{
+                        style: { color: '#ffffff' },
+                        sx: {
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffffff',
+                            borderWidth: '2px', // Adjust the border width here
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffffff',
+                            borderWidth: '2px', // Adjust the border width on hover
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ffffff',
+                            borderWidth: '2px', // Adjust the border width when focused
+                          },
+                        },
+                      }}
+                    />
                     <IconButton
                       onClick={() => removeNodeField(index)}
                       aria-label="remove node"

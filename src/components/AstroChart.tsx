@@ -69,7 +69,7 @@ const AstroChart: React.FC<AstroChartProps> = ({
     .domain([0, d3.max(analysisResults.linkData, d => d.value) || 1]);
 
   return (
-    <Box width="100%" height="500px" overflow="hidden">
+    <Box width="100%" height="100%" overflow="hidden">
       {viewState === 'Node Relationship View' && (
         <NodeRelationshipView
           nodes={nodeData}
