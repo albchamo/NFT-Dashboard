@@ -60,11 +60,6 @@ const SingleContractPage: React.FC<SingleContractPageProps> = ({ params }) => {
   return (
     <div>
       <Header
-        onControlClick={() => router.back()}
-        onFetchDataClick={() => {}}
-        onCSVUploadClick={() => {}}
-        onCSVExportClick={() => {}}
-        isDrawerOpen={false}
       />
       {loading && <LoadingModal open={loading} message="Fetching data... please wait." />}
       {!loading && (

@@ -10,10 +10,11 @@ interface ChartProps {
   onHoverTokenCount: (tokenCount: number) => void;
   onLeaveTokenCount: () => void;
   onClickTokenCount: (tokenCount: number | null) => void;
-  setExportList: (holders: Set<string>) => void; // Add this prop
+  setExportList: (holders: Set<string>) => void;
+  allHolders: Set<string>; // Add this prop
 }
 
-const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount, onClickTokenCount, setExportList }) => {
+const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLeaveTokenCount, onClickTokenCount, setExportList, allHolders }) => {
   const [activeTokenCount, setActiveTokenCount] = useState<number | null>(null);
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [totalHolders, setTotalHolders] = useState<number>(0);
@@ -43,8 +44,8 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onHoverTokenCount, onLea
       setActiveTokenCount(null);
       setIsClicked(false);
       onClickTokenCount(null);
-      setExportList(new Set()); // Clear export list when no token count is selected
-      console.log('Export list cleared');
+      setExportList(allHolders); // Reset to allHolders when no token count is selected
+      console.log('Export list reset to all holders:', allHolders);
     } else {
       setActiveTokenCount(tokenCount);
       setIsClicked(true);

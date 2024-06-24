@@ -29,10 +29,17 @@ interface AstroChartProps {
   hoverTokenCount?: number | null;
   clickTokenCount?: number | null;
   setClickTokenCount: (count: number | null) => void;
-  setExportList: (holders: Set<string>) => void; // Added prop
+  setExportList: (holders: Set<string>) => void;
 }
 
-const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, hoverTokenCount, clickTokenCount, setClickTokenCount, setExportList }) => {
+const AstroChart: React.FC<AstroChartProps> = ({
+  nodes = [],
+  analysisResults,
+  hoverTokenCount,
+  clickTokenCount,
+  setClickTokenCount,
+  setExportList
+}) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [selectedHolders, setSelectedHolders] = useState<Set<string> | null>(null);
   const [viewState, setViewState] = useState<'Node Relationship View' | 'Token Combination View'>('Node Relationship View');
@@ -297,7 +304,8 @@ const AstroChart: React.FC<AstroChartProps> = ({ nodes = [], analysisResults, ho
     } else {
       setViewState('Node Relationship View');
       setSelectedHolders(null);
-      setExportList(new Set()); // Clear export list when no token count is selected
+      // Comment out the line that clears the exportList when no token count is selected
+      // setExportList(new Set()); // Clear export list when no token count is selected
     }
   }, [clickTokenCount, analysisResults.tokenCombinations, setExportList]);
 

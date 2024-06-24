@@ -26,7 +26,9 @@ const Dashboard = () => {
     handleLeaveTokenCount,
     handleClickTokenCount,
     noContractsFetched,
-    fetchAllHolders
+    fetchAllHolders,
+    allHolders // Ensure allHolders is available
+
   } = useDashboard();
 
   console.log('Dashboard nodes:', nodes); // Debug log
@@ -68,6 +70,8 @@ const Dashboard = () => {
               onLeaveTokenCount={handleLeaveTokenCount}
               onClickTokenCount={handleClickTokenCount}
               setExportList={setExportList}
+              allHolders={allHolders} // Pass allHolders as a prop
+
             />
           </Box>
           <Box width="75%">

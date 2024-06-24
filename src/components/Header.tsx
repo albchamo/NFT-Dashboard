@@ -5,10 +5,11 @@ import { AppBar, Toolbar, Button } from '@mui/material';
 import { useDashboard } from '../hooks/useDashboard';
 import { useDrawer } from '../context/DrawerContext';
 
-
 const Header = () => {
-  const { onClickHoldersExport } = useDashboard();
+  const { onClickHoldersExport, exportList } = useDashboard();
   const { isDrawerOpen, toggleDrawer } = useDrawer();
+
+  console.log('Header exportList:', exportList); // Add log for exportList in Header
 
   return (
     <AppBar
@@ -30,9 +31,9 @@ const Header = () => {
           }}
         >
           {isDrawerOpen ? 'Close' : 'Contracts'}
-          </Button>
+        </Button>
         <Button
-          onClick={onClickHoldersExport} // Ensure this is correctly named
+          onClick={onClickHoldersExport}
           style={{
             borderColor: '#ffffff',
             color: '#ffffff',
@@ -52,3 +53,4 @@ const Header = () => {
 };
 
 export default Header;
+

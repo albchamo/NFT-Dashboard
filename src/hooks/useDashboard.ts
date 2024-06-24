@@ -12,12 +12,12 @@ export const useDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [hoverTokenCount, setHoverTokenCount] = useState<number | null>(null);
   const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
-  const [exportList, setExportList] = useState<Set<string> | null>(null);
+  const [exportList, setExportList] = useState<Set<string>>(new Set());
   const [allHolders, setAllHolders] = useState<Set<string>>(new Set());
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const { toggleDrawer, closeDrawer } = useDrawer(); // Added closeDrawer
+  const { toggleDrawer, closeDrawer } = useDrawer();
   const router = useRouter(); 
 
   useEffect(() => {
@@ -27,9 +27,11 @@ export const useDashboard = () => {
   useEffect(() => {
     if (clickTokenCount !== null && analysisResults) {
       const holders = analysisResults.holdersByTokenCount[clickTokenCount];
-      setExportList(holders || null);
+      setExportList(holders || allHolders);  // Fall back to allHolders if holders is undefined or null
+      console.log(`Export list updated for token count ${clickTokenCount}:`, holders || allHolders);
     } else {
-      setExportList(allHolders);
+      setExportList(allHolders);  // Reset to allHolders if no token count is selected
+      console.log('Export list reset to all holders:', allHolders);
     }
   }, [clickTokenCount, analysisResults, allHolders]);
 
@@ -64,7 +66,7 @@ export const useDashboard = () => {
   };
 
   const onClickHoldersExport = () => {
-    if (!exportList || exportList.size === 0) {
+    if (exportList.size === 0) {
       alert("No holder data available for export");
       return;
     }
@@ -78,10 +80,10 @@ export const useDashboard = () => {
 
   const fetchAllHolders = async () => {
     setLoading(true);
-    closeDrawer(); // Use closeDrawer to ensure the drawer is closed after fetching data
+    closeDrawer();
 
     try {
-      const mainContractAddress = nodes[0]?.address; // Add optional chaining to prevent errors
+      const mainContractAddress = nodes[0]?.address;
       const otherContracts = nodes.slice(1);
 
       if (!mainContractAddress) {
@@ -99,13 +101,16 @@ export const useDashboard = () => {
       console.log('Holder set:', holderSet);
 
       setAllHolders(holderSet);
-      console.log('All holders state set:', allHolders);
+      console.log('All holders state set:', holderSet);
 
       const analysis = analyzeHolders(allHolders);
-      console.log('Analysis results:', analysis); // Add log for analysis results
+      console.log('Analysis results:', analysis);
 
       setAnalysisResults(analysis);
-      console.log('Set analysisResults:', analysis); // Log the analysis result that is set
+      console.log('Set analysisResults:', analysis);
+
+      setExportList(holderSet); // Ensure exportList is updated with allHolders
+      console.log('Set exportList to allHolders:', holderSet);
     } catch (error) {
       console.error('Error fetching holders:', error);
     } finally {
@@ -155,10 +160,11 @@ export const useDashboard = () => {
 
   const noContractsFetched = nodes.length === 0 || (nodes.length === 1 && !nodes[0].address);
 
-  console.log('noContractsFetched:', noContractsFetched); // Add console log
-  console.log('nodes:', nodes); // Add console log
-  console.log('loading:', loading); // Add console log
-  console.log('analysisResults:', analysisResults); // Add console log
+  console.log('noContractsFetched:', noContractsFetched);
+  console.log('nodes:', nodes);
+  console.log('loading:', loading);
+  console.log('analysisResults:', analysisResults);
+  console.log('exportList:', exportList); // Add console log for exportList
 
   return {
     nodes,
