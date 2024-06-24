@@ -1,14 +1,17 @@
+"use client"; 
+
 import React from 'react';
 import { Box, Drawer, Button, Menu, MenuItem, Typography } from "@mui/material";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import NodeForm from './NodeForm';
 import CSVExport from './CSVExport';
+import CSVUpload from './CSVUpload'; 
+import { useDrawer } from '../context/DrawerContext';
 import { useDashboard } from '../hooks/useDashboard';
 
 const ContractDrawer: React.FC = () => {
+  const { isDrawerOpen, toggleDrawer } = useDrawer();
   const {
-    drawerOpen,
-    toggleDrawer,
     handleCSVClick,
     anchorEl,
     handleCSVClose,
@@ -21,13 +24,14 @@ const ContractDrawer: React.FC = () => {
     addNodeField,
     removeNodeField,
     loading,
+    handleCSVUpload,
     exportNodes
   } = useDashboard();
 
   return (
     <Drawer
       anchor="top"
-      open={drawerOpen}
+      open={isDrawerOpen}
       onClose={toggleDrawer}
       PaperProps={{
         style: {
@@ -86,7 +90,7 @@ const ContractDrawer: React.FC = () => {
               margin: '0 12px',
             }}
           >
-            {drawerOpen ? 'Close Control' : 'Open Control'}
+            {isDrawerOpen ? 'Close Control' : 'Open Control'}
           </Button>
           <Button
             onClick={fetchAllHolders}
@@ -119,6 +123,7 @@ const ContractDrawer: React.FC = () => {
           loading={loading}
         />
         <CSVExport data={nodes.map(node => ({ address: node.address, tag: node.tag }))} filename="nodes.csv" />
+        <CSVUpload onUpload={handleCSVUpload} />
       </Box>
     </Drawer>
   );

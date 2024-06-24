@@ -1,9 +1,14 @@
+'use client';
+
 import React from 'react';
 import { AppBar, Toolbar, Button } from '@mui/material';
 import { useDashboard } from '../hooks/useDashboard';
+import { useDrawer } from '../context/DrawerContext';
+
 
 const Header = () => {
-  const { toggleDrawer, drawerOpen, onClickNodesExport } = useDashboard();
+  const { onClickHoldersExport } = useDashboard();
+  const { isDrawerOpen, toggleDrawer } = useDrawer();
 
   return (
     <AppBar
@@ -24,10 +29,10 @@ const Header = () => {
             borderRadius: "12px",
           }}
         >
-          {drawerOpen ? 'Close' : 'Contracts'}
-        </Button>
+          {isDrawerOpen ? 'Close' : 'Contracts'}
+          </Button>
         <Button
-          onClick={onClickNodesExport} // Ensure this is correctly named
+          onClick={onClickHoldersExport} // Ensure this is correctly named
           style={{
             borderColor: '#ffffff',
             color: '#ffffff',

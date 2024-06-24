@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography } from "@mui/material";
 import Header from '../../components/Header';
 import Chart from '../../components/BarChart';
@@ -14,39 +14,41 @@ import { useDashboard } from '../../hooks/useDashboard';
 const Dashboard = () => {
   const {
     nodes,
-    setNodes,
     loading,
     hoverTokenCount,
     clickTokenCount,
     exportList,
     setExportList,
-    allHolders,
     analysisResults,
-    anchorEl,
-    handleCSVClick,
-    handleCSVClose,
-    onCSVUploadClick,
-    onClickNodesExport,
-    onClickHoldersExport,
-    fetchAllHolders,
-    updateNodeField,
-    addNodeField,
-    removeNodeField,
     handleCSVUpload,
     exportNodes,
     handleHoverTokenCount,
     handleLeaveTokenCount,
     handleClickTokenCount,
-    drawerOpen,
-    noContractsFetched
+    noContractsFetched,
+    fetchAllHolders
   } = useDashboard();
+
+  console.log('Dashboard nodes:', nodes); // Debug log
+  console.log('Dashboard analysisResults:', analysisResults); // Debug log
+  console.log('Dashboard noContractsFetched:', noContractsFetched); // Debug log
+
+  useEffect(() => {
+    // Fetch data when the component mounts if nodes are present
+    if (nodes.length > 0 && nodes[0].address) {
+      fetchAllHolders();
+    }
+  }, []);
+
+  if (loading) {
+    return <LoadingModal open={loading} message="Fetching data... please wait." />;
+  }
 
   return (
     <div>
-      <Header
-      />
+      <Header />
       <ContractDrawer />
-      {noContractsFetched ? (
+      {noContractsFetched || !analysisResults ? (
         <Box
           display="flex"
           flexDirection="column"
@@ -69,16 +71,14 @@ const Dashboard = () => {
             />
           </Box>
           <Box width="75%">
-            {!loading && analysisResults && (
-              <AstroChart
-                nodes={nodes}
-                analysisResults={analysisResults}
-                hoverTokenCount={hoverTokenCount}
-                clickTokenCount={clickTokenCount}
-                setClickTokenCount={handleClickTokenCount}
-                setExportList={setExportList}
-              />
-            )}
+            <AstroChart
+              nodes={nodes}
+              analysisResults={analysisResults}
+              hoverTokenCount={hoverTokenCount}
+              clickTokenCount={clickTokenCount}
+              setClickTokenCount={handleClickTokenCount}
+              setExportList={setExportList}
+            />
           </Box>
         </Box>
       )}
@@ -86,7 +86,6 @@ const Dashboard = () => {
         <CSVUpload onUpload={handleCSVUpload} />
         <CSVExport data={exportNodes()} filename="nodes.csv" />
       </div>
-      <LoadingModal open={loading} message="Fetching data... please wait." />
     </div>
   );
 };
