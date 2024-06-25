@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell
 } from 'recharts';
@@ -7,23 +7,12 @@ import { Box, Typography } from '@mui/material';
 
 interface ChartProps {
   analysisResults: AnalysisResults | null;
-  onClickTokenCount: (tokenCount: number | null) => void;
   setExportListToTokenCount: (tokenCount: number) => void; // Use the function here
   resetExportList: () => void;
 }
 
-const Chart: React.FC<ChartProps> = ({ analysisResults, onClickTokenCount, setExportListToTokenCount, resetExportList }) => {
+const Chart: React.FC<ChartProps> = ({ analysisResults,  setExportListToTokenCount, resetExportList }) => {
   const [activeTokenCount, setActiveTokenCount] = useState<number | null>(null);
-  const [totalHolders, setTotalHolders] = useState<number>(0);
-
-  useEffect(() => {
-    console.log('Active token count changed:', activeTokenCount);
-    if (activeTokenCount !== null && analysisResults) {
-      setTotalHolders(analysisResults.tokenHoldingCounts[activeTokenCount] || 0);
-    } else {
-      setTotalHolders(Object.values(analysisResults?.tokenHoldingCounts || {}).reduce((sum, holders) => sum + holders, 0));
-    }
-  }, [activeTokenCount, analysisResults]);
 
   if (!analysisResults) return null;
 
@@ -39,12 +28,10 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onClickTokenCount, setEx
     console.log('Token count clicked:', tokenCount);
     if (activeTokenCount === tokenCount) {
       setActiveTokenCount(null);
-      onClickTokenCount(null);
       resetExportList(); // Reset to allHolders when no token count is selected
       console.log('Export list reset to all holders:');
     } else {
       setActiveTokenCount(tokenCount);
-      onClickTokenCount(tokenCount);
       setExportListToTokenCount(tokenCount); // Update export list with holders of the selected token count
       console.log(`Export list updated for token count ${tokenCount}`);
     }
@@ -85,9 +72,6 @@ const Chart: React.FC<ChartProps> = ({ analysisResults, onClickTokenCount, setEx
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      <Typography variant="body1" gutterBottom style={{ textAlign: 'right', paddingTop: '16px', fontSize: '18px' }}>
-        Holders: {totalHolders}
-      </Typography>
     </Box>
   );
 };

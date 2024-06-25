@@ -10,7 +10,6 @@ interface AstroChartProps {
   nodes: { address: string; tag: string }[];
   analysisResults: AnalysisResults;
   clickTokenCount?: number | null;
-  setClickTokenCount: (count: number | null) => void;
   setExportListToLink: (link: Link) => void;
   resetExportList: () => void;
 }
@@ -19,7 +18,6 @@ const AstroChart: React.FC<AstroChartProps> = ({
   nodes = [],
   analysisResults,
   clickTokenCount,
-  setClickTokenCount,
   setExportListToLink,
   resetExportList,
 }) => {
@@ -32,22 +30,9 @@ const AstroChart: React.FC<AstroChartProps> = ({
     } else {
       setViewState('Node Relationship View');
       setSelectedLink(null);
-      resetExportList();
     }
   }, [clickTokenCount, resetExportList]);
 
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (!(event.target as Element).closest('svg')) {
-      setClickTokenCount(null);
-    }
-  }, [setClickTokenCount]);
-
-  useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [handleClickOutside]);
 
   const angleStep = (2 * Math.PI) / nodes.length;
   const nodeData: Node[] = nodes.map((node, index) => ({
@@ -69,7 +54,7 @@ const AstroChart: React.FC<AstroChartProps> = ({
     .domain([0, d3.max(analysisResults.linkData, d => d.value) || 1]);
 
   return (
-    <Box width="100%" height="100%" overflow="hidden">
+    <Box width="100%" height="100%" display="flex" justifyContent="center" alignItems="center" overflow="hidden">
       {viewState === 'Node Relationship View' && (
         <NodeRelationshipView
           nodes={nodeData}

@@ -13,12 +13,10 @@ const Dashboard = () => {
   const {
     nodes,
     loading,
-    clickTokenCount,
     setExportListToTokenCount,
     setExportListToLink,
     resetExportList,
     analysisResults,
-    handleClickTokenCount,
     noContractsFetched,
   } = useDashboard();
 
@@ -53,6 +51,7 @@ const Dashboard = () => {
         width="100%"
         height="80vh" // Adjust height to fit the screen properly
         justifyContent="space-between" // Distribute space evenly
+        alignItems="center" // Center content vertically
         style={{ paddingTop: '40px', paddingLeft: '20px', paddingRight: '20px' }} // Adjust padding for layout
       >
           {analysisResults && (
@@ -65,13 +64,13 @@ const Dashboard = () => {
                 justifyContent="center" // Center content vertically
               >                <Chart
                   analysisResults={analysisResults}
-                  onClickTokenCount={handleClickTokenCount}
                   setExportListToTokenCount={setExportListToTokenCount}
                   resetExportList={resetExportList}
                 />
               </Box>
               <Box
                 width="65%" // Adjust width to give more space to the chart
+                height= "100%"
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
@@ -82,8 +81,6 @@ const Dashboard = () => {
                 <AstroChart
                   nodes={nodes}
                   analysisResults={analysisResults}
-                  clickTokenCount={clickTokenCount}
-                  setClickTokenCount={handleClickTokenCount}
                   setExportListToLink={setExportListToLink}
                   resetExportList={resetExportList}
                 />

@@ -1,6 +1,4 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getAllHolders } from '../services/alchemyService';
 import { analyzeHolders, AnalysisResults } from '../components/analysisService';
@@ -12,7 +10,6 @@ export const useDashboard = () => {
   const searchParams = useSearchParams();
   const [nodes, setNodes] = useState<{ address: string; tag: string }[]>(() => getNodesFromUrl());
   const [loading, setLoading] = useState(false);
-  const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
   const [exportList, setExportList] = useState<Set<string>>(new Set());
   const [allHolders, setAllHolders] = useState<Set<string>>(new Set());
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
@@ -33,18 +30,8 @@ export const useDashboard = () => {
     updateUrlParams(router, nodes);
   }, [nodes, router]);
 
-  useEffect(() => {
-    if (clickTokenCount !== null && analysisResults) {
-      const holders = analysisResults.holdersByTokenCount[clickTokenCount];
-      setExportList(holders || allHolders);
-      console.log(`Export list updated for token count ${clickTokenCount}:`, holders || allHolders);
-    } else {
-      setExportList(allHolders);
-      console.log('Export list reset to all holders:', allHolders);
-    }
-  }, [clickTokenCount, analysisResults, allHolders]);
 
-  const fetchAllHolders = async () => {
+  const fetchAllHolders = useCallback(async () => {
     setLoading(true);
     closeDrawer();
 
@@ -85,26 +72,26 @@ export const useDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [nodes, closeDrawer]);
 
-  const setExportListToTokenCount = (tokenCount: number) => {
+  const setExportListToTokenCount = useCallback((tokenCount: number) => {
     if (analysisResults) {
       const holders = analysisResults.holdersByTokenCount[tokenCount];
       setExportList(holders || allHolders);
       console.log(`Export list updated for token count ${tokenCount}:`, holders || allHolders);
     }
-  };
+  }, [analysisResults, allHolders]);
 
-  const setExportListToLink = (link: Link) => {
+  const setExportListToLink = useCallback((link: Link) => {
     const holders = new Set(link.addresses);
     setExportList(holders);
     console.log('Export list updated for link:', holders);
-  };
+  }, []);
 
-  const resetExportList = () => {
+  const resetExportList = useCallback(() => {
     setExportList(allHolders);
     console.log('Export list reset to all holders:', allHolders);
-  };
+  }, [allHolders]);
 
   const noContractsFetched = nodes.length === 0 || (nodes.length === 1 && !nodes[0].address);
 
@@ -112,14 +99,12 @@ export const useDashboard = () => {
     nodes,
     setNodes, // Ensure setNodes is returned so it can be used to update the URL
     loading,
-    clickTokenCount,
     exportList,
     setExportListToTokenCount,
     setExportListToLink,
     resetExportList,
     allHolders,
     analysisResults,
-    handleClickTokenCount: setClickTokenCount,
     noContractsFetched,
   };
 };

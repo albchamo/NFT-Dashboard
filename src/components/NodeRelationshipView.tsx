@@ -31,12 +31,23 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
     svg.selectAll('*').remove();
 
     // General Configuration
-    const width = 900;
-    const height = 540;
+    const parentNode = svg.node()?.parentNode as HTMLElement | null;
+    const containerWidth = parentNode?.getBoundingClientRect().width || 900;
+    const containerHeight = parentNode?.getBoundingClientRect().height || 540;
+    const width = containerWidth;
+    const height = containerHeight;
     const centerX = width / 2;
     const centerY = height / 2;
+    const radius = Math.min(width, height) / 2 - 30; // Adjust radius to fit better
 
-    svg
+    // Scale the node positions
+    const scaledNodes = nodes.map((node, index) => ({
+      ...node,
+      x: radius * Math.cos(index * (2 * Math.PI / nodes.length) - Math.PI / 2),
+      y: radius * Math.sin(index * (2 * Math.PI / nodes.length) - Math.PI / 2)
+    }));
+
+    const g = svg
       .attr('width', width)
       .attr('height', height)
       .attr('viewBox', `0 0 ${width} ${height}`)
@@ -45,16 +56,19 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
       .attr('transform', `translate(${centerX},${centerY})`);
 
     // Draw Links
-    svg.append('g')
+    g.append('g')
       .selectAll('path')
       .data(links)
       .enter().append('path')
       .attr('class', 'link')
       .attr('d', (d: Link) => {
-        const dx = d.target.x - d.source.x;
-        const dy = d.target.y - d.source.y;
+        const sourceNode = scaledNodes.find(node => node.id === d.source.id);
+        const targetNode = scaledNodes.find(node => node.id === d.target.id);
+        if (!sourceNode || !targetNode) return '';
+        const dx = targetNode.x - sourceNode.x;
+        const dy = targetNode.y - sourceNode.y;
         const dr = Math.sqrt(dx * dx + dy * dy);
-        return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+        return `M${sourceNode.x},${sourceNode.y}A${dr},${dr} 0 0,1 ${targetNode.x},${targetNode.y}`;
       })
       .attr('stroke-width', d => Math.sqrt(d.value) / 4)
       .attr('stroke', d => linkColorScale(d.value))
@@ -71,9 +85,9 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
       });
 
     // Draw Nodes
-    const nodesGroup = svg.append('g')
+    const nodesGroup = g.append('g')
       .selectAll('g')
-      .data(nodes)
+      .data(scaledNodes)
       .enter().append('g')
       .attr('class', 'node')
       .attr('transform', d => `translate(${d.x},${d.y})`);
