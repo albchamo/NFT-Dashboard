@@ -15,6 +15,8 @@ export const useDashboard = () => {
   const [allHolders, setAllHolders] = useState<Set<string>>(new Set());
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
   const [initialFetch, setInitialFetch] = useState<boolean>(true);
+  const [clickTokenCount, setClickTokenCount] = useState<number | null>(null);
+
 
   const { closeDrawer } = useDrawer();
   const router = useRouter();
@@ -79,6 +81,7 @@ export const useDashboard = () => {
     if (analysisResults) {
       const holders = analysisResults.holdersByTokenCount[tokenCount];
       setExportList(holders || allHolders);
+      setClickTokenCount(tokenCount);
       console.log(`Export list updated for token count ${tokenCount}:`, holders || allHolders);
     }
   }, [analysisResults, allHolders, setExportList]);
@@ -91,6 +94,8 @@ export const useDashboard = () => {
 
   const resetExportList = useCallback(() => {
     setExportList(allHolders);
+    setClickTokenCount(null);
+
     console.log('Export list reset to all holders:', allHolders);
   }, [allHolders, setExportList]);
 
@@ -107,5 +112,7 @@ export const useDashboard = () => {
     allHolders,
     analysisResults,
     noContractsFetched,
+    clickTokenCount, // Return clickTokenCount
+
   };
 };

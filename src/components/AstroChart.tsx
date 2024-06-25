@@ -25,14 +25,13 @@ const AstroChart: React.FC<AstroChartProps> = ({
   const [viewState, setViewState] = useState<'Node Relationship View' | 'Token Combination View'>('Node Relationship View');
 
   useEffect(() => {
-    if (clickTokenCount !== null && clickTokenCount !== undefined) {
+    if (clickTokenCount !== null && clickTokenCount !== undefined && clickTokenCount > 2) {
       setViewState('Token Combination View');
     } else {
       setViewState('Node Relationship View');
       setSelectedLink(null);
     }
   }, [clickTokenCount, resetExportList]);
-
 
   const angleStep = (2 * Math.PI) / nodes.length;
   const nodeData: Node[] = nodes.map((node, index) => ({

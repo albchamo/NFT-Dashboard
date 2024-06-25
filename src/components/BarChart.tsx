@@ -40,7 +40,7 @@ const Chart: React.FC<ChartProps> = ({ analysisResults,  setExportListToTokenCou
   return (
     <Box style={{ paddingLeft: '20px' }}>
       <Typography variant="h4" gutterBottom style={{ textAlign: 'center', paddingBottom: '20px' }}>
-        Holders by Token Count
+        Token Combinations
       </Typography>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart layout="vertical" data={barData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>

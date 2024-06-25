@@ -44,9 +44,18 @@ const Header = () => {
         >
           {isDrawerOpen ? 'Close' : 'Contracts'}
         </Button>
-        <Box style={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="h6" style={{ marginRight: '12px' }}>
-            Export list updated: {exportListCount} holders
+        <Box style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          borderWidth: '3px',
+          borderStyle: 'solid',
+          borderColor: '#ffffff',
+          padding: "20px"
+          }}>
+          <Typography variant="h6" style={{ 
+            marginRight: '30px', 
+             }}>
+            Selected: {exportListCount} holders
           </Typography>
           <CSVExport
             data={exportData} // Ensure exportList is transformed to the required structure

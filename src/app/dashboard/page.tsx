@@ -18,6 +18,7 @@ const Dashboard = () => {
     resetExportList,
     analysisResults,
     noContractsFetched,
+    clickTokenCount, // Use clickTokenCount from useDashboard
   } = useDashboard();
 
   console.log('Dashboard nodes:', nodes); // Debug log
@@ -81,6 +82,7 @@ const Dashboard = () => {
                 <AstroChart
                   nodes={nodes}
                   analysisResults={analysisResults}
+                  clickTokenCount={clickTokenCount} // Pass clickTokenCount to AstroChart
                   setExportListToLink={setExportListToLink}
                   resetExportList={resetExportList}
                 />
