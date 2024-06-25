@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Cell
 } from 'recharts';
-import { AnalysisResults } from '../components/analysisService';
+import { AnalysisResults } from '../services/analysisService';
 import { Box, Typography } from '@mui/material';
 
 interface ChartProps {

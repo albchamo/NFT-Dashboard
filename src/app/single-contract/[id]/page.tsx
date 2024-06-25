@@ -5,9 +5,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getHolders, getContractMetadata } from '../../../services/alchemyService';
-import Header from '../../../components/Header';
-import LoadingModal from '../../../components/LoadingModal';
-import CSVExport from '../../../components/CSVExport';
+import Header from '../../../components/common/Header';
+import LoadingModal from '../../../components/common/LoadingModal';
+import CSVExport from '../../../utils/CSVExport';
 import { Box, Typography, Button } from "@mui/material";
 
 interface Params {

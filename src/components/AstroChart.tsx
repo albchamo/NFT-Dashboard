@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Box } from '@mui/material';
 import * as d3 from 'd3';
-import { AnalysisResults } from '../components/analysisService';
+import { AnalysisResults } from '../services/analysisService';
 import NodeRelationshipView from './NodeRelationshipView';
 import TokenCombinationView from './TokenCombinationView';
 import { Node, Link, TokenCombination } from './AstroChartTypes';

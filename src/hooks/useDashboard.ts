@@ -1,22 +1,24 @@
+// src/hooks/useDashboard.ts
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getAllHolders } from '../services/alchemyService';
-import { analyzeHolders, AnalysisResults } from '../components/analysisService';
+import { analyzeHolders, AnalysisResults } from '../services/analysisService';
 import { getNodesFromUrl, updateUrlParams } from '../utils/urlUtils';
 import { useDrawer } from '../context/DrawerContext';
+import { useExportList } from '../context/ExportListContext';
 import { Node, Link } from '../components/AstroChartTypes';
 
 export const useDashboard = () => {
   const searchParams = useSearchParams();
   const [nodes, setNodes] = useState<{ address: string; tag: string }[]>(() => getNodesFromUrl());
   const [loading, setLoading] = useState(false);
-  const [exportList, setExportList] = useState<Set<string>>(new Set());
   const [allHolders, setAllHolders] = useState<Set<string>>(new Set());
   const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
   const [initialFetch, setInitialFetch] = useState<boolean>(true);
 
   const { closeDrawer } = useDrawer();
   const router = useRouter();
+  const { exportList, setExportList } = useExportList();
 
   // Fetch all holders when the component mounts if nodes are available in the URL
   useEffect(() => {
@@ -29,7 +31,6 @@ export const useDashboard = () => {
   useEffect(() => {
     updateUrlParams(router, nodes);
   }, [nodes, router]);
-
 
   const fetchAllHolders = useCallback(async () => {
     setLoading(true);
@@ -72,7 +73,7 @@ export const useDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [nodes, closeDrawer]);
+  }, [nodes, closeDrawer, setExportList]);
 
   const setExportListToTokenCount = useCallback((tokenCount: number) => {
     if (analysisResults) {
@@ -80,18 +81,18 @@ export const useDashboard = () => {
       setExportList(holders || allHolders);
       console.log(`Export list updated for token count ${tokenCount}:`, holders || allHolders);
     }
-  }, [analysisResults, allHolders]);
+  }, [analysisResults, allHolders, setExportList]);
 
   const setExportListToLink = useCallback((link: Link) => {
     const holders = new Set(link.addresses);
     setExportList(holders);
     console.log('Export list updated for link:', holders);
-  }, []);
+  }, [setExportList]);
 
   const resetExportList = useCallback(() => {
     setExportList(allHolders);
     console.log('Export list reset to all holders:', allHolders);
-  }, [allHolders]);
+  }, [allHolders, setExportList]);
 
   const noContractsFetched = nodes.length === 0 || (nodes.length === 1 && !nodes[0].address);
 

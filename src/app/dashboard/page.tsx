@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import Header from '../../components/Header';
+import Header from '../../components/common/Header';
 import Chart from '../../components/BarChart';
 import AstroChart from '../../components/AstroChart';
-import ContractDrawer from '../../components/ContractDrawer';
-import LoadingModal from '../../components/LoadingModal';
+import ContractDrawer from '../../components/common/ContractDrawer';
+import LoadingModal from '../../components/common/LoadingModal';
 import { useDashboard } from '../../hooks/useDashboard';
 
 const Dashboard = () => {

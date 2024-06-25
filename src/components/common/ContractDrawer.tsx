@@ -3,12 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Drawer, Button, Typography } from "@mui/material";
 import NodeForm from './NodeForm';
-import CSVExport from './CSVExport';
-import CSVUpload from './CSVUpload'; 
-import { useDrawer } from '../context/DrawerContext';
+import CSVExport from '../../utils/CSVExport';
+import CSVUpload from '../../utils/CSVUpload'; 
+import { useDrawer } from '../../context/DrawerContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getNodesFromUrl, updateUrlParams } from '../utils/urlUtils';
-import { useDashboard } from '../hooks/useDashboard';
+import { getNodesFromUrl, updateUrlParams } from '../../utils/urlUtils';
 
 const ContractDrawer: React.FC = () => {
   const { isDrawerOpen, toggleDrawer } = useDrawer();
