@@ -43,7 +43,9 @@ const Dashboard = () => {
           height="80vh"
         >
           <Typography variant="h3">Welcome to Snapshooter. </Typography>
-          <Typography variant="body1">Add contracts to begin to explore.</Typography>
+          <Typography variant="body1">A tool to find common holders between multiple NFT contracts on Base. 
+          <br />
+          Please add the contract adresses on the control to begin.</Typography>
         </Box>
       ) : (
         <Box

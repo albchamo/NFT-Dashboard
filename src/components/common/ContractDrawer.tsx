@@ -13,32 +13,40 @@ const ContractDrawer: React.FC = () => {
   const { isDrawerOpen, toggleDrawer } = useDrawer();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [shouldUpdateUrl, setShouldUpdateUrl] = useState(false); // Local state to control URL updates
 
   const [nodes, setNodes] = useState<{ address: string; tag: string }[]>(() => getNodesFromUrl());
 
   useEffect(() => {
-    updateUrlParams(router, nodes);
-  }, [nodes, router]);
+    if (shouldUpdateUrl) {
+      updateUrlParams(router, nodes);
+    }
+  }, [nodes, router, shouldUpdateUrl]);
 
   const handleNodeChange = (index: number, field: 'address' | 'tag', value: string) => {
     const updatedNodes = [...nodes];
     updatedNodes[index][field] = value;
     setNodes(updatedNodes);
+    setShouldUpdateUrl(true); // Set flag to update URL
   };
 
   const addNodeField = () => {
     setNodes([...nodes, { address: '', tag: '' }]);
+    setShouldUpdateUrl(true); // Set flag to update URL
   };
 
   const removeNodeField = (index: number) => {
     const updatedNodes = [...nodes];
     updatedNodes.splice(index, 1);
     setNodes(updatedNodes);
+    setShouldUpdateUrl(true); // Set flag to update URL
   };
 
   const handleCSVUpload = (data: { address: string; tag: string }[]) => {
     setNodes(data);
+    setShouldUpdateUrl(true); // Set flag to update URL
   };
+
   const refreshPage = () => {
     window.location.reload(); // This will reload the page with the updated URL
   };
@@ -68,7 +76,7 @@ const ContractDrawer: React.FC = () => {
     >
       <Box role="presentation" display="flex" flexDirection="column" style={{ paddingTop: '16px' }}>
         <Box display="flex" justifyContent="center" mb={2}>
-          <CSVExport data={nodes.map(node => ({ address: node.address, tag: node.tag }))} filename="nodes.csv" />
+          <CSVExport data={nodes.map(node => ({ address: node.address, tag: node.tag }))} filename="nodes.csv"  />
           <CSVUpload onUpload={handleCSVUpload} />
           <Button
             onClick={toggleDrawer}

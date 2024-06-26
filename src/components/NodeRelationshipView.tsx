@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { Box } from '@mui/material';
 import { Node, Link } from './AstroChartTypes';
+import { useRouter } from 'next/navigation';
 
 interface NodeRelationshipViewProps {
   nodes: Node[];
@@ -23,6 +24,7 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
   setSelectedLink,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -56,7 +58,7 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
       .attr('transform', `translate(${centerX},${centerY})`);
 
     // Draw Links
-    g.append('g')
+    const linkSelection = g.append('g')
       .selectAll('path')
       .data(links)
       .enter().append('path')
@@ -70,19 +72,28 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
         const dr = Math.sqrt(dx * dx + dy * dy);
         return `M${sourceNode.x},${sourceNode.y}A${dr},${dr} 0 0,1 ${targetNode.x},${targetNode.y}`;
       })
-      .attr('stroke-width', d => Math.sqrt(d.value) / 4)
-      .attr('stroke', d => linkColorScale(d.value))
+      .attr('stroke-width', (d: Link) => Math.sqrt(d.value) / 4)
+      .attr('stroke', (d: Link) => selectedLink === d ? 'red' : linkColorScale(d.value)) // Set initial color based on selection
       .attr('fill', 'none')
       .attr('stroke-opacity', 0.9)
       .on('click', function(event, d: Link) {
+
         if (selectedLink === d) {
+          // Deselect the link
           setSelectedLink(null);
           resetExportList();
+          d3.select(`path.link-${selectedLink.source.id}-${selectedLink.target.id}`)
+          .attr('stroke', linkColorScale(selectedLink.value));
         } else {
+          // Select the link
           setSelectedLink(d);
           setExportListToLink(d);
+
+          // Update the color of the clicked link to red
+          d3.select(this).style('stroke', 'red');
         }
-      });
+      })
+      .attr('class', (d: Link) => `link link-${d.source.id}-${d.target.id}`);
 
     // Draw Nodes
     const nodesGroup = g.append('g')
@@ -90,7 +101,10 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
       .data(scaledNodes)
       .enter().append('g')
       .attr('class', 'node')
-      .attr('transform', d => `translate(${d.x},${d.y})`);
+      .attr('transform', d => `translate(${d.x},${d.y})`)
+      .on('click', (event, d: Node) => {
+        router.push(`/single-contract/${d.id}`);
+      });
 
     nodesGroup.append('circle')
       .attr('r', 10)
@@ -137,7 +151,7 @@ const NodeRelationshipView: React.FC<NodeRelationshipViewProps> = ({
     return () => {
       tooltip.remove();
     };
-  }, [nodes, links, linkColorScale, selectedLink, setSelectedLink, setExportListToLink, resetExportList]);
+  }, [nodes, links, linkColorScale, selectedLink, setSelectedLink, setExportListToLink, resetExportList, router]);
 
   return <Box width="100%" height="100%" overflow="hidden"><svg ref={svgRef}></svg></Box>;
 };

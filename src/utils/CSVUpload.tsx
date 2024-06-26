@@ -24,7 +24,7 @@ const CSVUpload: React.FC<CSVUploadProps> = ({ onUpload }) => {
 
   return (
     <div>
-      <Button variant="contained" component="label" id="csv-upload-button">
+      <Button variant="contained" component="label" id="csv-upload-button" style={{padding: "20px", borderRadius: "12px", margin: "0px 0px 0px 20px"} }  >
         Upload CSV
         <input type="file" hidden accept=".csv" onChange={handleFileUpload} />
       </Button>

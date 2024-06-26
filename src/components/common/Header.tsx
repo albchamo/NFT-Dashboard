@@ -26,6 +26,11 @@ const Header = () => {
       style={{ top: 'auto', bottom: 0, background: '#000000', color: '#ffffff' }}
     >
       <Toolbar style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Typography variant="h4" style={{ 
+            marginLeft: '30px', 
+             }}>
+            Snapshooter
+          </Typography>
         <Box style={{ flex: 1 }} /> {/* Empty box to push the button to center */}
         <Button
           onClick={toggleDrawer}
@@ -50,7 +55,9 @@ const Header = () => {
           borderWidth: '3px',
           borderStyle: 'solid',
           borderColor: '#ffffff',
-          padding: "20px"
+          borderRadius: "12px",
+          paddingLeft: "20px",
+          paddingRight: "0px"
           }}>
           <Typography variant="h6" style={{ 
             marginRight: '30px', 

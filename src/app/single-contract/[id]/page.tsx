@@ -1,4 +1,4 @@
-// single-contract/[id]/page.tsx
+// src/app/single-contract/[id]/page.tsx
 
 'use client';
 
@@ -7,8 +7,10 @@ import { useRouter } from 'next/navigation';
 import { getHolders, getContractMetadata } from '../../../services/alchemyService';
 import Header from '../../../components/common/Header';
 import LoadingModal from '../../../components/common/LoadingModal';
-import CSVExport from '../../../utils/CSVExport';
+import { useDashboard } from '../../../hooks/useDashboard';
 import { Box, Typography, Button } from "@mui/material";
+import ContractDrawer from '../../../components/common/ContractDrawer';
+
 
 interface Params {
   id: string;
@@ -28,6 +30,7 @@ const SingleContractPage: React.FC<SingleContractPageProps> = ({ params }) => {
   const [loading, setLoading] = useState(false);
   const [holders, setHolders] = useState<Set<string>>(new Set());
   const [metadata, setMetadata] = useState<TokenMetadataResponse | null>(null);
+  const { setExportListToContractHolders } = useDashboard();
   const router = useRouter();
 
   useEffect(() => {
@@ -43,6 +46,7 @@ const SingleContractPage: React.FC<SingleContractPageProps> = ({ params }) => {
         console.log(`Fetched metadata:`, fetchedMetadata);
         setHolders(fetchedHolders);
         setMetadata(fetchedMetadata);
+        setExportListToContractHolders(fetchedHolders);
       } catch (error) {
         console.error('Error fetching contract data:', error);
       } finally {
@@ -51,27 +55,15 @@ const SingleContractPage: React.FC<SingleContractPageProps> = ({ params }) => {
     };
 
     fetchContractData();
-  }, [id]);
-
-  const exportData = () => {
-    return Array.from(holders).map(holder => ({ address: holder }));
-  };
+  }, [id, setExportListToContractHolders]);
 
   return (
     <div>
-      <Header
-      />
+      <Header />
+      <ContractDrawer/>
       {loading && <LoadingModal open={loading} message="Fetching data... please wait." />}
       {!loading && (
         <Box sx={{ paddingTop: '5%', paddingLeft: "20%" }}>
-          {metadata && (
-            <Box sx={{ marginBottom: '20px' }}>
-              <Typography variant="body1"><strong>Name:</strong> {metadata.name ?? 'N/A'}</Typography>
-              <Typography variant="body1"><strong>Symbol:</strong> {metadata.symbol ?? 'N/A'}</Typography>
-            </Box>
-          )}
-          <Typography variant="body1"><strong>Contract Address:</strong> {id}</Typography>
-          <Typography variant="body1"><strong>Number of Holders:</strong> {holders.size}</Typography>
           <Button
             variant="contained"
             color="primary"
@@ -80,7 +72,14 @@ const SingleContractPage: React.FC<SingleContractPageProps> = ({ params }) => {
           >
             Back
           </Button>
-          <CSVExport data={exportData()} filename={`${id}-holders.csv`} />
+          {metadata && (
+            <Box sx={{ marginBottom: '20px' }}>
+              <Typography variant="body1"><strong>Collection Name:</strong> {metadata.name ?? 'N/A'}</Typography>
+              <Typography variant="body1"><strong>Symbol:</strong> {metadata.symbol ?? 'N/A'}</Typography>
+            </Box>
+          )}
+          <Typography variant="body1"><strong>Contract Address:</strong> {id}</Typography>
+          <Typography variant="body1"><strong>Number of Holders:</strong> {holders.size}</Typography>
         </Box>
       )}
     </div>

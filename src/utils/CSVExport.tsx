@@ -14,7 +14,7 @@ const CSVExport: React.FC<CSVExportProps> = ({ data, filename }) => {
 
   return (
     <CSVLink data={data} filename={filename} style={{ color: 'white', textDecoration: 'none' }}>
-      <Button variant="contained" color="primary" id="csv-export-button">
+    <Button variant="contained" color="primary" id="csv-export-button" style={{padding: "20px", borderRadius: "0px 10px 10px 0px"} }>
         Export CSV
       </Button>
     </CSVLink>

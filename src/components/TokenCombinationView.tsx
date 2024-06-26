@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import { Node, TokenCombination } from './AstroChartTypes';
 import { scaleSequential } from 'd3-scale';
 import { interpolateBlues } from 'd3-scale-chromatic';
+import { useRouter } from 'next/navigation';
 
 interface TokenCombinationViewProps {
   nodes: Node[];
@@ -17,6 +18,7 @@ const TokenCombinationView: React.FC<TokenCombinationViewProps> = ({
   tokenCount,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (!nodes.length || !tokenCombinations[tokenCount]) return;
@@ -51,7 +53,10 @@ const TokenCombinationView: React.FC<TokenCombinationViewProps> = ({
       .data(scaledNodes)
       .enter().append('g')
       .attr('class', 'node')
-      .attr('transform', d => `translate(${d.x},${d.y})`);
+      .attr('transform', d => `translate(${d.x},${d.y})`)
+      .on('click', (event, d: Node) => {
+        router.push(`/single-contract/${d.id}`);
+      });
 
     nodesGroup.append('circle')
       .attr('r', 10)
@@ -88,7 +93,7 @@ const TokenCombinationView: React.FC<TokenCombinationViewProps> = ({
     return () => {
       svg.selectAll('*').remove();
     };
-  }, [nodes, tokenCombinations, tokenCount]);
+  }, [nodes, tokenCombinations, tokenCount, router]);
 
   return <Box width="100%" height="100%" overflow="hidden"><svg ref={svgRef} width="100%" height="100%" ></svg></Box>;
 };
