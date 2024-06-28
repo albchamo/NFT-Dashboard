@@ -8,6 +8,7 @@ import LoadingModal from '../../../components/common/LoadingModal';
 import { useDashboard } from '../../../hooks/useDashboard';
 import { Box, Typography, Button, Card, CardMedia, CardContent } from "@mui/material";
 import ContractDrawer from '../../../components/common/ContractDrawer';
+import TopBar from '@/components/common/Topbar';
 
 interface Params {
   id: string;
@@ -80,6 +81,8 @@ const SingleContractPage: React.FC<SingleContractPageProps> = ({ params }) => {
 
   return (
     <div>
+      <TopBar />
+
       <Footer />
       <ContractDrawer />
       {loading && <LoadingModal open={loading} message="Fetching data... please wait." />}

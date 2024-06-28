@@ -66,11 +66,6 @@ const Footer = () => {
           <CSVExport data={exportData} filename="holders.csv" />
         </Box>
       </Toolbar>
-      <Box textAlign="center" paddingY="10px">
-        <Typography variant="body2" color="#fff">
-          Made with <FavoriteIcon sx={{ verticalAlign: 'middle', color: 'red' }} /> from Latam by Tech Rebel. Support this product -&gt;  Snapshooter.eth
-        </Typography>
-      </Box>
     </AppBar>
   );
 };

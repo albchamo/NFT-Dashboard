@@ -8,6 +8,7 @@ import AstroChart from '../../components/AstroChart';
 import ContractDrawer from '../../components/common/ContractDrawer';
 import LoadingModal from '../../components/common/LoadingModal';
 import { useDashboard } from '../../hooks/useDashboard';
+import TopBar from '@/components/common/Topbar';
 
 
 const Dashboard = () => {
@@ -33,7 +34,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      
+      <TopBar />
       <ContractDrawer />
       {noContractsFetched || !analysisResults ? (
         <Box
@@ -42,9 +43,12 @@ const Dashboard = () => {
           justifyContent="center"
           alignItems="center"
           height="80vh"
+          textAlign="center" // Add this line to center the text horizontally
+
+          
         >
           <Typography variant="h3">Welcome to Snapshooter. </Typography>
-          <Typography variant="body1">A tool to find common holders between multiple NFT contracts on Base. 
+          <Typography variant="body1">A tool to visualize relationships between multiple NFT contracts on Base. 
           <br />
           Please add the contract adresses on the control to begin.</Typography>
         </Box>
