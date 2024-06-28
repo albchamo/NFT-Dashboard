@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import Header from '../../components/common/Header';
+import Footer from '../../components/common/Footer';
 import Chart from '../../components/BarChart';
 import AstroChart from '../../components/AstroChart';
 import ContractDrawer from '../../components/common/ContractDrawer';
 import LoadingModal from '../../components/common/LoadingModal';
 import { useDashboard } from '../../hooks/useDashboard';
+
 
 const Dashboard = () => {
   const {
@@ -32,7 +33,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <Header />
+      
       <ContractDrawer />
       {noContractsFetched || !analysisResults ? (
         <Box
@@ -93,6 +94,7 @@ const Dashboard = () => {
           )}
         </Box>
       )}
+<Footer />
     </div>
   );
 };

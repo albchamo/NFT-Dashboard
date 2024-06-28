@@ -5,8 +5,9 @@ import { AppBar, Toolbar, Button, Typography, Box } from '@mui/material';
 import CSVExport from '../../utils/CSVExport';
 import { useDrawer } from '../../context/DrawerContext';
 import { useExportList } from '../../context/ExportListContext';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
-const Header = () => {
+const Footer = () => {
   const { isDrawerOpen, toggleDrawer } = useDrawer();
   const { exportList } = useExportList();
   const [exportListCount, setExportListCount] = useState(0);
@@ -26,11 +27,9 @@ const Header = () => {
       style={{ top: 'auto', bottom: 0, background: '#000000', color: '#ffffff' }}
     >
       <Toolbar style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Typography variant="h4" style={{ 
-            marginLeft: '30px', 
-             }}>
-            Snapshooter
-          </Typography>
+        <Typography variant="h4" style={{ marginLeft: '30px' }}>
+          Snapshooter
+        </Typography>
         <Box style={{ flex: 1 }} /> {/* Empty box to push the button to center */}
         <Button
           onClick={toggleDrawer}
@@ -40,8 +39,8 @@ const Header = () => {
             borderWidth: '3px',
             borderStyle: 'solid',
             padding: '12px 18px',
-            fontSize: "18px",
-            borderRadius: "12px",
+            fontSize: '18px',
+            borderRadius: '12px',
             position: 'absolute', // Absolute positioning to center
             left: '50%',
             transform: 'translateX(-50%)',
@@ -49,29 +48,31 @@ const Header = () => {
         >
           {isDrawerOpen ? 'Close' : 'Contracts'}
         </Button>
-        <Box style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          borderWidth: '3px',
-          borderStyle: 'solid',
-          borderColor: '#ffffff',
-          borderRadius: "12px",
-          paddingLeft: "20px",
-          paddingRight: "0px"
-          }}>
-          <Typography variant="h6" style={{ 
-            marginRight: '30px', 
-             }}>
+        <Box
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: '#ffffff',
+            borderRadius: '12px',
+            paddingLeft: '20px',
+            paddingRight: '0px',
+          }}
+        >
+          <Typography variant="h6" style={{ marginRight: '30px' }}>
             Selected: {exportListCount} holders
           </Typography>
-          <CSVExport
-            data={exportData} // Ensure exportList is transformed to the required structure
-            filename="holders.csv"
-          />
+          <CSVExport data={exportData} filename="holders.csv" />
         </Box>
       </Toolbar>
+      <Box textAlign="center" paddingY="10px">
+        <Typography variant="body2" color="#fff">
+          Made with <FavoriteIcon sx={{ verticalAlign: 'middle', color: 'red' }} /> from Latam by Tech Rebel. Support this product -&gt;  Snapshooter.eth
+        </Typography>
+      </Box>
     </AppBar>
   );
 };
 
-export default Header;
+export default Footer;
