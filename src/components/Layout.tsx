@@ -11,6 +11,9 @@ interface LayoutProps {
 
 const theme = createTheme({
   palette: {
+    primary: {
+      main: '#0052ff', // Replace this with your desired primary color
+    },
     background: {
       default: '#000000',  // Dark background
     },
